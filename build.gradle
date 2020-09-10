@@ -1,5 +1,10 @@
+import org.codehaus.groovy.runtime.GStringImpl
+
 buildscript {
 	repositories {
+		maven { url "http://maven.aliyun.com/nexus/content/groups/public/"}
+		maven{ url 'https://maven.aliyun.com/nexus/content/repositories/jcenter'}
+
 		maven { url "https://repo.spring.io/plugins-release" }
 	}
 	dependencies {
@@ -47,7 +52,7 @@ ext {
 	tomcatVersion        = "9.0.37"
 	undertowVersion      = "2.0.30.Final"
 
-	gradleScriptDir = "${rootProject.projectDir}/gradle"
+	gradleScriptDir = "${rootProject.projectDir}/gradle" as GStringImpl
 	withoutJclOverSlf4j = {
 		exclude group: "org.slf4j", module: "jcl-over-slf4j"
 	}
@@ -147,6 +152,10 @@ configure(allprojects) { project ->
 	}
 
 	repositories {
+		// 国内阿里云镜像
+		maven { url "http://maven.aliyun.com/nexus/content/groups/public/"}
+		maven{ url 'https://maven.aliyun.com/nexus/content/repositories/jcenter'}
+
 		mavenCentral()
 		maven { url "https://repo.spring.io/libs-release" }
 	}
@@ -217,7 +226,7 @@ configure(subprojects - project(":spring-build-src")) { subproject ->
 		description = "Generates project-level javadoc for use in -javadoc jar"
 
 		options.encoding = "UTF-8"
-		options.memberLevel = org.gradle.external.javadoc.JavadocMemberLevel.PROTECTED
+		options.memberLevel = JavadocMemberLevel.PROTECTED
 		options.author = true
 		options.header = project.name
 		options.use = true
