@@ -232,7 +232,7 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 					"postProcessBeanFactory already called on this post-processor against " + registry);
 		}
 		this.registriesPostProcessed.add(registryId);
-
+		// 加载BeanDefinition信息！！！
 		processConfigBeanDefinitions(registry);
 	}
 
@@ -248,13 +248,15 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 					"postProcessBeanFactory already called on this post-processor against " + beanFactory);
 		}
 		this.factoriesPostProcessed.add(factoryId);
+		// 未解析配置类的话，先进行解析
 		if (!this.registriesPostProcessed.contains(factoryId)) {
 			// BeanDefinitionRegistryPostProcessor hook apparently not supported...
 			// Simply call processConfigurationClasses lazily at this point then.
 			processConfigBeanDefinitions((BeanDefinitionRegistry) beanFactory);
 		}
-
+		// 代理处理（增强@Configuration类）！！！！！！
 		enhanceConfigurationClasses(beanFactory);
+		// 给容器注册一个 ImportAwareBeanPostProcessor（当前类内部类）
 		beanFactory.addBeanPostProcessor(new ImportAwareBeanPostProcessor(beanFactory));
 	}
 
@@ -309,6 +311,7 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 		}
 
 		// Parse each @Configuration class
+		// 解析每个 @Configuration对象
 		ConfigurationClassParser parser = new ConfigurationClassParser(
 				this.metadataReaderFactory, this.problemReporter, this.environment,
 				this.resourceLoader, this.componentScanBeanNameGenerator, registry);
@@ -316,6 +319,7 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 		Set<BeanDefinitionHolder> candidates = new LinkedHashSet<>(configCandidates);
 		Set<ConfigurationClass> alreadyParsed = new HashSet<>(configCandidates.size());
 		do {
+			// 处理@Configuration对象。会扫描配置的Bean，并且注册到BeanDefinitionMap中!!!!!!
 			parser.parse(candidates);
 			parser.validate();
 
@@ -372,9 +376,11 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 	 * @see ConfigurationClassEnhancer
 	 */
 	public void enhanceConfigurationClasses(ConfigurableListableBeanFactory beanFactory) {
+		// 找出 full 模式的配置类 ！！！
 		Map<String, AbstractBeanDefinition> configBeanDefs = new LinkedHashMap<>();
 		for (String beanName : beanFactory.getBeanDefinitionNames()) {
 			BeanDefinition beanDef = beanFactory.getBeanDefinition(beanName);
+			// 找 @Configuration 类 ！！！！！
 			Object configClassAttr = beanDef.getAttribute(ConfigurationClassUtils.CONFIGURATION_CLASS_ATTRIBUTE);
 			MethodMetadata methodMetadata = null;
 			if (beanDef instanceof AnnotatedBeanDefinition) {
@@ -394,6 +400,7 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 					}
 				}
 			}
+			// 找出 full 模式的配置类 ！！！
 			if (ConfigurationClassUtils.CONFIGURATION_CLASS_FULL.equals(configClassAttr)) {
 				if (!(beanDef instanceof AbstractBeanDefinition)) {
 					throw new BeanDefinitionStoreException("Cannot enhance @Configuration bean definition '" +
@@ -413,6 +420,7 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 			return;
 		}
 
+		// 遍历进行 CGLIB 代理，由 ConfigurationClassEnhancer#enhance 方法实现
 		ConfigurationClassEnhancer enhancer = new ConfigurationClassEnhancer();
 		for (Map.Entry<String, AbstractBeanDefinition> entry : configBeanDefs.entrySet()) {
 			AbstractBeanDefinition beanDef = entry.getValue();
@@ -420,12 +428,14 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 			beanDef.setAttribute(AutoProxyUtils.PRESERVE_TARGET_CLASS_ATTRIBUTE, Boolean.TRUE);
 			// Set enhanced subclass of the user-specified bean class
 			Class<?> configClass = beanDef.getBeanClass();
+			// CGLIB 代理增强！！！！！！
 			Class<?> enhancedClass = enhancer.enhance(configClass, this.beanClassLoader);
 			if (configClass != enhancedClass) {
 				if (logger.isTraceEnabled()) {
 					logger.trace(String.format("Replacing bean definition '%s' existing class '%s' with " +
 							"enhanced class '%s'", entry.getKey(), configClass.getName(), enhancedClass.getName()));
 				}
+				// 将之前的BeanDefinition中Class 更改成 CGLIB的代理类的Class
 				beanDef.setBeanClass(enhancedClass);
 			}
 		}

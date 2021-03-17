@@ -517,22 +517,33 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	public void refresh() throws BeansException, IllegalStateException {
 		synchronized (this.startupShutdownMonitor) {
 			// Prepare this context for refreshing.
+			// 容器刷新前的准备，设置上下文状态、获取属性、验证必要的属性
 			prepareRefresh();
 
 			// Tell the subclass to refresh the internal bean factory.
+			// 销毁之前的BeanFactory&创建新的BeanFactory,这里是DefaultListableBeanFactory
+			// XML版本的Bean定义需要加载BeanDefinition ！！！！！
+			// 注解版本的Bean定义不在此处加载BeanDefinition ！！！
 			ConfigurableListableBeanFactory beanFactory = obtainFreshBeanFactory();
 
 			// Prepare the bean factory for use in this context.
+			// 配置标准的BeanFactory ↓↓↓
+			// 设置ClassLoader、SpEl表达式解析器
+			// 添加一些忽略注入的接口
+			// 添加Bean、BeanPostProcessor
 			prepareBeanFactory(beanFactory);
 
 			try {
 				// Allows post-processing of the bean factory in context subclasses.
+				// 允许子类对BeanFactory进行扩展处理
 				postProcessBeanFactory(beanFactory);
 
 				// Invoke factory processors registered as beans in the context.
+				// 调用实现了BeanFactoryPostProcessor接口的类（分批次执行不同的实现） &&  注解版本的Bean定义将在此处加载和注册BeanDefinition
 				invokeBeanFactoryPostProcessors(beanFactory);
 
 				// Register bean processors that intercept bean creation.
+				// 注册BeanPostProcessor
 				registerBeanPostProcessors(beanFactory);
 
 				// Initialize message source for this context.
@@ -547,7 +558,9 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				// Check for listener beans and register them.
 				registerListeners();
 
+
 				// Instantiate all remaining (non-lazy-init) singletons.
+				// 初始化所有 (非懒加载) 的单例！！！！！！！！！！！！！！！！！！！
 				finishBeanFactoryInitialization(beanFactory);
 
 				// Last step: publish corresponding event.
@@ -635,6 +648,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 * @see #getBeanFactory()
 	 */
 	protected ConfigurableListableBeanFactory obtainFreshBeanFactory() {
+		// 刷新BeanFactory！！！
 		refreshBeanFactory();
 		return getBeanFactory();
 	}

@@ -122,9 +122,15 @@ abstract class ConfigurationClassUtils {
 		}
 
 		Map<String, Object> config = metadata.getAnnotationAttributes(Configuration.class.getName());
+		// full模式 ！！！！！！
+		// 好处：该模式下 @Configuration类会生成CGLIB子类(增强),可以进行Bean依赖关联
+		// 坏处：该类中的@Bean声明的类必须符合SpringAOP规则(不能是private、final)的,启动项目会更慢.
 		if (config != null && !Boolean.FALSE.equals(config.get("proxyBeanMethods"))) {
 			beanDef.setAttribute(CONFIGURATION_CLASS_ATTRIBUTE, CONFIGURATION_CLASS_FULL);
 		}
+		// lite模式 ！！！！！！
+		// 好处：该模式下 运行性能更好，且会优化启动时间(因为不会使用AOP)， 但不能有Bean的依赖关系.
+		// 坏处：该类中的@Bean声明的类可以使用private 和 final 进行修饰（因为不会使用AOP）
 		else if (config != null || isConfigurationCandidate(metadata)) {
 			beanDef.setAttribute(CONFIGURATION_CLASS_ATTRIBUTE, CONFIGURATION_CLASS_LITE);
 		}

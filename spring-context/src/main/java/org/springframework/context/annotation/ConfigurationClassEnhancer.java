@@ -106,6 +106,7 @@ class ConfigurationClassEnhancer {
 			}
 			return configClass;
 		}
+		// 创建代理 ！！！！！
 		Class<?> enhancedClass = createClass(newEnhancer(configClass, classLoader));
 		if (logger.isTraceEnabled()) {
 			logger.trace(String.format("Successfully enhanced %s; enhanced class name is: %s",
@@ -119,9 +120,14 @@ class ConfigurationClassEnhancer {
 	 */
 	private Enhancer newEnhancer(Class<?> configSuperClass, @Nullable ClassLoader classLoader) {
 		Enhancer enhancer = new Enhancer();
+		// CGLIB 生成当前传入的类的子类
 		enhancer.setSuperclass(configSuperClass);
+
+		// 设置内部类接口EnhancedConfiguration 继承了 BeanFactoryAware
+		// 因此该代理类可以持有BeanFactory接口的功能
 		enhancer.setInterfaces(new Class<?>[] {EnhancedConfiguration.class});
 		enhancer.setUseFactory(false);
+		// 代理类命名策略
 		enhancer.setNamingPolicy(SpringNamingPolicy.INSTANCE);
 		enhancer.setStrategy(new BeanFactoryAwareGeneratorStrategy(classLoader));
 		enhancer.setCallbackFilter(CALLBACK_FILTER);
@@ -137,6 +143,8 @@ class ConfigurationClassEnhancer {
 		Class<?> subclass = enhancer.createClass();
 		// Registering callbacks statically (as opposed to thread-local)
 		// is critical for usage in an OSGi environment (SPR-5932)...
+		// 拦截器！！！
+		// 注册了两个核心拦截器:BeanMethodInterceptor、 BeanFactoryAwareMethodInterceptor (都是当前类的的内部类，高内聚的体现)
 		Enhancer.registerStaticCallbacks(subclass, CALLBACKS);
 		return subclass;
 	}
@@ -274,6 +282,7 @@ class ConfigurationClassEnhancer {
 	private static class BeanMethodInterceptor implements MethodInterceptor, ConditionalCallback {
 
 		/**
+		 * 该方法主要拦截 @Bean 声明的方法
 		 * Enhance a {@link Bean @Bean} method to check the supplied BeanFactory for the
 		 * existence of this bean object.
 		 * @throws Throwable as a catch-all for any exception that may be thrown when invoking the
@@ -283,7 +292,7 @@ class ConfigurationClassEnhancer {
 		@Nullable
 		public Object intercept(Object enhancedConfigInstance, Method beanMethod, Object[] beanMethodArgs,
 					MethodProxy cglibMethodProxy) throws Throwable {
-
+			// 这个地方是反射获取的 BeanFactory 对象
 			ConfigurableBeanFactory beanFactory = getBeanFactory(enhancedConfigInstance);
 			String beanName = BeanAnnotationHelper.determineBeanNameFor(beanMethod);
 
