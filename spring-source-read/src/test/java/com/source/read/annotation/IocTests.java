@@ -25,7 +25,7 @@ public class IocTests {
 	public void iocAnnotationTest() {
 		ApplicationContext context = new AnnotationConfigApplicationContext(MainApplication.class);
 		System.out.println(" 注解版 MainApplication---->" + context.getBean(MainApplication.class));
-		System.out.println(" 注解版 使用 @Component 配置的 @Bean 对象---->" + context.getBean(ComponentConfig.ComponentX.class));
+		System.out.println(" 注解版 使用 @Component 配置的 @Bean 对象---->" + context.getBean("componentX"));
 		System.out.println(" 注解版 BeanA---->" + context.getBean(BeanA.class));
 	}
 

@@ -530,12 +530,13 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 			// 配置标准的BeanFactory ↓↓↓
 			// 设置ClassLoader、SpEl表达式解析器
 			// 添加一些忽略注入的接口
-			// 添加Bean、BeanPostProcessor
+			// 添加 BeanPostProcessor
+			// 实例化系统环境相关的单例Bean实例
 			prepareBeanFactory(beanFactory);
 
 			try {
 				// Allows post-processing of the bean factory in context subclasses.
-				// 允许子类对BeanFactory进行扩展处理
+				// 允许子类对BeanFactory进行扩展处理,这里目前没有子类调用.
 				postProcessBeanFactory(beanFactory);
 
 				// Invoke factory processors registered as beans in the context.
@@ -552,6 +553,8 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				// Initialize event multicaster for this context.
 				initApplicationEventMulticaster();
 
+				// 在特定的上下文初始化其它Bean
+				// SpringBoot 内嵌Servlet 容器 就是在这里初始化的!!!!!!!!.
 				// Initialize other special beans in specific context subclasses.
 				onRefresh();
 
@@ -690,6 +693,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 			beanFactory.setTempClassLoader(new ContextTypeMatchClassLoader(beanFactory.getBeanClassLoader()));
 		}
 
+		// 实例化默认环境单例Bean实例
 		// Register default environment beans.
 		if (!beanFactory.containsLocalBean(ENVIRONMENT_BEAN_NAME)) {
 			beanFactory.registerSingleton(ENVIRONMENT_BEAN_NAME, getEnvironment());

@@ -84,8 +84,12 @@ public class AnnotationConfigApplicationContext extends GenericApplicationContex
 	 * {@link Configuration @Configuration} classes
 	 */
 	public AnnotationConfigApplicationContext(Class<?>... componentClasses) {
+		// 创建BeanDefinitionReader、BeanDefinitionScanner
+		// 注册框架内的5个BeanDefinition
 		this();
+		// 注册方法参数传入的BeanDefinition
 		register(componentClasses);
+		// 刷新容器，非常重要（生命周期方法都在这里面）！！！！！！！！！！
 		refresh();
 	}
 
