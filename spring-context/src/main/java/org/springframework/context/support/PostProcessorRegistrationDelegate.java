@@ -56,8 +56,9 @@ final class PostProcessorRegistrationDelegate {
 	public static void invokeBeanFactoryPostProcessors (
 			ConfigurableListableBeanFactory beanFactory, List<BeanFactoryPostProcessor> beanFactoryPostProcessors) {
 
-		// BeanFactoryPostProcessor 的调用分几种.!!!!!!!!
-
+		// ==== BeanFactoryPostProcessor 类型有两种
+		// ==== 一、BeanDefinitionRegistryPostProcessor (优先执行)
+		// ==== 二、BeanFactoryPostProcessor
 
 		// 1.如果有的话先调用 BeanDefinitionRegistryPostProcessor ！！！！！！！！！
 		// BeanDefinitionRegistryPostProcessors 继承了 BeanFactoryPostProcessor ！！！
@@ -67,15 +68,18 @@ final class PostProcessorRegistrationDelegate {
 		if (beanFactory instanceof BeanDefinitionRegistry) {
 			// 将BeanFactory 强转为 BeanDefinitionRegistry
 			BeanDefinitionRegistry registry = (BeanDefinitionRegistry) beanFactory;
-			// 常规 BeanFactoryPostProcessor
+			// 定义常规的 BeanFactoryPostProcessor
 			List<BeanFactoryPostProcessor> regularPostProcessors = new ArrayList<>();
-			// 特殊的 BeanFactoryPostProcessor--》 BeanDefinitionRegistryPostProcessor
+			// 定义特殊的 BeanFactoryPostProcessor--》 BeanDefinitionRegistryPostProcessor
 			List<BeanDefinitionRegistryPostProcessor> registryProcessors = new ArrayList<>();
 
+			// 一般不会手动 new BeanFactoryPostProcessor() 再添加到ApplicationContext的实现中 , 一般都是让spring自动扫描!!!
 			for (BeanFactoryPostProcessor postProcessor : beanFactoryPostProcessors) {
+				// 手动找到的 BeanFactoryPostProcessor、BeanDefinitionRegistryPostProcessor 都是 自己进行实例化的，生命周期不由spring管理.
 				if (postProcessor instanceof BeanDefinitionRegistryPostProcessor) {
 					BeanDefinitionRegistryPostProcessor registryProcessor =
 							(BeanDefinitionRegistryPostProcessor) postProcessor;
+					// 找到了 手动传入的 BeanDefinitionRegistryPostProcessor 则优先执行一次该方法.
 					registryProcessor.postProcessBeanDefinitionRegistry(registry);
 					registryProcessors.add(registryProcessor);
 				}
@@ -91,10 +95,11 @@ final class PostProcessorRegistrationDelegate {
 			List<BeanDefinitionRegistryPostProcessor> currentRegistryProcessors = new ArrayList<>();
 
 			// First, invoke the BeanDefinitionRegistryPostProcessors that implement PriorityOrdered.
-			// 1.1 先调用实现了 Priority的BeanDefinitionRegistryPostProcessor
+			// 1.1 先调用实现了 PriorityOrdered的BeanDefinitionRegistryPostProcessor
 			String[] postProcessorNames =
 					beanFactory.getBeanNamesForType(BeanDefinitionRegistryPostProcessor.class, true, false);
 			for (String ppName : postProcessorNames) {
+				// 实例化 BeanFactoryPostProcessor 接口对象
 				if (beanFactory.isTypeMatch(ppName, PriorityOrdered.class)) {
 					currentRegistryProcessors.add(beanFactory.getBean(ppName, BeanDefinitionRegistryPostProcessor.class));
 					processedBeans.add(ppName);
@@ -102,7 +107,7 @@ final class PostProcessorRegistrationDelegate {
 			}
 			sortPostProcessors(currentRegistryProcessors, beanFactory);
 			registryProcessors.addAll(currentRegistryProcessors);
-			// 调用Bean 注册！！！！！！
+			// 1.1 调用 BeanDefinitionRegistryPostProcessor Bean 注册！！！！！！
 			invokeBeanDefinitionRegistryPostProcessors(currentRegistryProcessors, registry);
 			currentRegistryProcessors.clear();
 
@@ -119,7 +124,7 @@ final class PostProcessorRegistrationDelegate {
 			}
 			sortPostProcessors(currentRegistryProcessors, beanFactory);
 			registryProcessors.addAll(currentRegistryProcessors);
-			// 调用Bean 注册！！！！！！
+			// 1.2调用 BeanDefinitionRegistryPostProcessor Bean 注册！！！！！！
 			invokeBeanDefinitionRegistryPostProcessors(currentRegistryProcessors, registry);
 			currentRegistryProcessors.clear();
 
@@ -139,7 +144,7 @@ final class PostProcessorRegistrationDelegate {
 				}
 				sortPostProcessors(currentRegistryProcessors, beanFactory);
 				registryProcessors.addAll(currentRegistryProcessors);
-				// 调用Bean 注册！！！！！！
+				// 1.3 调用Bean 注册！！！！！！
 				invokeBeanDefinitionRegistryPostProcessors(currentRegistryProcessors, registry);
 				currentRegistryProcessors.clear();
 			}
@@ -150,7 +155,9 @@ final class PostProcessorRegistrationDelegate {
 			invokeBeanFactoryPostProcessors(regularPostProcessors, beanFactory);
 		}
 
-		// 2. 没有 BeanDefinitionRegistryPostProcessor 的情况下
+		// 二、单纯的BeanFactoryPostProcessor
+		// 2. 没有 BeanDefinitionRegistryPostProcessor 的情况下,
+		// 这个else 很难进入, 这里beanFactory默认是使用的 DefaultListableBeanFactory 创建的, 该类实现了 BeanDefinitionRegistry 的！！！
 		else {
 			// Invoke factory processors registered with the context instance.
 			// 直接调用 BeanFactoryPostProcessor(BeanDefinitionRegistryPostProcessors) 的 postProcessorBeanFactory 方法修改 BeanDefinition 信息 ！！！！

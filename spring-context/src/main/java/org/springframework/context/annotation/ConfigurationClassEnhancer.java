@@ -95,6 +95,7 @@ class ConfigurationClassEnhancer {
 	 * @return the enhanced subclass
 	 */
 	public Class<?> enhance(Class<?> configClass, @Nullable ClassLoader classLoader) {
+		// 如果已经增强(代理)，则直接返回该 Class
 		if (EnhancedConfiguration.class.isAssignableFrom(configClass)) {
 			if (logger.isDebugEnabled()) {
 				logger.debug(String.format("Ignoring request to enhance %s as it has " +
@@ -106,7 +107,7 @@ class ConfigurationClassEnhancer {
 			}
 			return configClass;
 		}
-		// 创建代理 ！！！！！
+		// 创建CGLIB代理 ！！！！！
 		Class<?> enhancedClass = createClass(newEnhancer(configClass, classLoader));
 		if (logger.isTraceEnabled()) {
 			logger.trace(String.format("Successfully enhanced %s; enhanced class name is: %s",

@@ -18,6 +18,8 @@ package org.springframework.context.annotation;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -322,6 +324,7 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 		Set<ConfigurationClass> alreadyParsed = new HashSet<>(configCandidates.size());
 		do {
 			// 处理@Configuration对象。会扫描配置的Bean，并且注册到BeanDefinitionMap中!!!!!!
+			// 这个方法很重要！！！！！
 			parser.parse(candidates);
 			parser.validate();
 

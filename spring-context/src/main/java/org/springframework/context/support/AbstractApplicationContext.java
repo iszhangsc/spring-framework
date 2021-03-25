@@ -521,7 +521,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 			prepareRefresh();
 
 			// Tell the subclass to refresh the internal bean factory.
-			// 销毁之前的BeanFactory&创建新的BeanFactory,这里是DefaultListableBeanFactory
+			// 销毁之前的BeanFactory&创建新的BeanFactory,这里的实现类是DefaultListableBeanFactory
 			// XML版本的Bean定义需要加载BeanDefinition ！！！！！
 			// 注解版本的Bean定义不在此处加载BeanDefinition ！！！
 			ConfigurableListableBeanFactory beanFactory = obtainFreshBeanFactory();
@@ -530,17 +530,18 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 			// 配置标准的BeanFactory ↓↓↓
 			// 设置ClassLoader、SpEl表达式解析器
 			// 添加一些忽略注入的接口
-			// 添加 BeanPostProcessor
+			// 添加 BeanPostProcessor (Aware 回调) !!!!
 			// 实例化系统环境相关的单例Bean实例
 			prepareBeanFactory(beanFactory);
 
 			try {
 				// Allows post-processing of the bean factory in context subclasses.
-				// 允许子类对BeanFactory进行扩展处理,这里目前没有子类调用.
+				// 空方法: 允许子类对BeanFactory进行扩展处理
 				postProcessBeanFactory(beanFactory);
 
 				// Invoke factory processors registered as beans in the context.
-				// 调用实现了BeanFactoryPostProcessor接口的类（分批次执行不同的实现） &&  注解版本的Bean定义将在此处加载和注册BeanDefinition
+				// 实例化BeanFactoryPostProcessor接口的类并且分批次执行不同的实现 &&  注解版本的Bean定义将在此处加载和注册BeanDefinition ！！！
+				// 这个方法的调用很重要, 在SpringBoot 中 的主动装配 BeanDefinition 就是调用了这一步.
 				invokeBeanFactoryPostProcessors(beanFactory);
 
 				// Register bean processors that intercept bean creation.
@@ -651,7 +652,11 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 * @see #getBeanFactory()
 	 */
 	protected ConfigurableListableBeanFactory obtainFreshBeanFactory() {
-		// 刷新BeanFactory！！！
+		// 两个方法都是抽象方法.
+		// 这里有两种实现:
+		// 一、继承了 GenericApplicationContext 类的将直接返回 DefaultListableBeanFactory
+		// 二、继承了 AbstractRefreshableApplicationContext 类的会先销毁 BeanFactory 再创建DefaultListableBeanFactory
+		// 然后再  customizeBeanFactory(beanFactory); loadBeanDefinitions(beanFactory);
 		refreshBeanFactory();
 		return getBeanFactory();
 	}
@@ -664,6 +669,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	protected void prepareBeanFactory(ConfigurableListableBeanFactory beanFactory) {
 		// Tell the internal bean factory to use the context's class loader etc.
 		beanFactory.setBeanClassLoader(getClassLoader());
+		// Bean 表达式解析器
 		beanFactory.setBeanExpressionResolver(new StandardBeanExpressionResolver(beanFactory.getBeanClassLoader()));
 		beanFactory.addPropertyEditorRegistrar(new ResourceEditorRegistrar(this, getEnvironment()));
 

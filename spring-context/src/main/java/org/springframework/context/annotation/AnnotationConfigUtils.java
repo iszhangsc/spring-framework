@@ -151,22 +151,29 @@ public abstract class AnnotationConfigUtils {
 		DefaultListableBeanFactory beanFactory = unwrapDefaultListableBeanFactory(registry);
 		if (beanFactory != null) {
 			if (!(beanFactory.getDependencyComparator() instanceof AnnotationAwareOrderComparator)) {
+				// 默认排序器
 				beanFactory.setDependencyComparator(AnnotationAwareOrderComparator.INSTANCE);
 			}
 			if (!(beanFactory.getAutowireCandidateResolver() instanceof ContextAnnotationAutowireCandidateResolver)) {
+				// ContextAnnotationAutowireCandidateResolver集成了多个Resolver,并且拥有BeanFactory功能.
+				// Simple(简单适配)、GenericType(泛型是否匹配)、Qualifier(@Qualifier和@Value)、Context(处理@Lazy)
 				beanFactory.setAutowireCandidateResolver(new ContextAnnotationAutowireCandidateResolver());
 			}
 		}
 
+		// =================================== 注册框架内部BeanDefinition 信息 ================================ //
 		Set<BeanDefinitionHolder> beanDefs = new LinkedHashSet<>(8);
 
 		if (!registry.containsBeanDefinition(CONFIGURATION_ANNOTATION_PROCESSOR_BEAN_NAME)) {
+			// ConfigurationClassPostProcessor对所有注册到Spring容器中的BeanDefinition进行处理 ！！！！invokeBeanFactoryPostProcessor 中最优先使用的就是该类处理
 			RootBeanDefinition def = new RootBeanDefinition(ConfigurationClassPostProcessor.class);
 			def.setSource(source);
 			beanDefs.add(registerPostProcessor(registry, def, CONFIGURATION_ANNOTATION_PROCESSOR_BEAN_NAME));
 		}
 
 		if (!registry.containsBeanDefinition(AUTOWIRED_ANNOTATION_PROCESSOR_BEAN_NAME)) {
+			// AutowiredAnnotationBeanPostProcessor处理的 Bean 的依赖注入，
+			// 相关的注解有 @Autowired @Value @Inject @Lookup 四个，也可以自定义注解后添到 autowiredAnnotationTypes 集合中
 			RootBeanDefinition def = new RootBeanDefinition(AutowiredAnnotationBeanPostProcessor.class);
 			def.setSource(source);
 			beanDefs.add(registerPostProcessor(registry, def, AUTOWIRED_ANNOTATION_PROCESSOR_BEAN_NAME));

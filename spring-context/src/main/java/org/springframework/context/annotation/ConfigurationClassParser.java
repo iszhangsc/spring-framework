@@ -190,6 +190,7 @@ class ConfigurationClassParser {
 			}
 		}
 
+		// 导入BeanDefinition，SpringBoot就是使用的这个完成自动装配.
 		this.deferredImportSelectorHandler.process();
 	}
 
@@ -788,6 +789,7 @@ class ConfigurationClassParser {
 					DeferredImportSelectorGroupingHandler handler = new DeferredImportSelectorGroupingHandler();
 					deferredImports.sort(DEFERRED_IMPORT_COMPARATOR);
 					deferredImports.forEach(handler::register);
+					// !!!!
 					handler.processGroupImports();
 				}
 			}

@@ -1,6 +1,7 @@
 package com.source.read.annotation;
 
 import com.source.read.annotation.bean.BeanA;
+import com.source.read.annotation.bean.BeanAFactoryPostProcessor;
 import com.source.read.annotation.bean.ComponentConfig;
 import com.source.read.xml.bean.XBeanA;
 import org.junit.jupiter.api.DisplayName;
@@ -23,9 +24,13 @@ public class IocTests {
 	@Test
 	@DisplayName("IOC注解版初始化")
 	public void iocAnnotationTest() {
-		ApplicationContext context = new AnnotationConfigApplicationContext(MainApplication.class);
+		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
+		context.register(MainApplication.class);
+		context.addBeanFactoryPostProcessor(new BeanAFactoryPostProcessor());
+		context.refresh();
 		System.out.println(" 注解版 MainApplication---->" + context.getBean(MainApplication.class));
 		System.out.println(" 注解版 使用 @Component 配置的 @Bean 对象---->" + context.getBean("componentX"));
+		System.out.println(" 注解版 BeanA---->" + context.getBean(BeanA.class));
 		System.out.println(" 注解版 BeanA---->" + context.getBean(BeanA.class));
 	}
 
