@@ -3,6 +3,8 @@ package com.source.read.annotation;
 import com.source.read.annotation.bean.BeanA;
 import com.source.read.annotation.bean.BeanAFactoryPostProcessor;
 import com.source.read.annotation.bean.ComponentConfig;
+import com.source.read.annotation.bean.Customize;
+import com.source.read.annotation.bean.CustomizeBeanFactory;
 import com.source.read.xml.bean.XBeanA;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -30,8 +32,9 @@ public class IocTests {
 		context.refresh();
 		System.out.println(" 注解版 MainApplication---->" + context.getBean(MainApplication.class));
 		System.out.println(" 注解版 使用 @Component 配置的 @Bean 对象---->" + context.getBean("componentX"));
-		System.out.println(" 注解版 BeanA---->" + context.getBean(BeanA.class));
-		System.out.println(" 注解版 BeanA---->" + context.getBean(BeanA.class));
+		System.out.println(" 注解版 CustomizeBeanFactory---->" + context.getBean(CustomizeBeanFactory.class));
+		System.out.println(" 注解版 CustomizeBeanFactory---->" + context.getBean("customizeBeanFactory"));
+		System.out.println(" 注解版 Customize---->" + context.getBean(Customize.class));
 	}
 
 

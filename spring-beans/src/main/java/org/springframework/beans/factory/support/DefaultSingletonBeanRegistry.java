@@ -86,7 +86,9 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	/** Set of registered singletons, containing the bean names in registration order. */
 	private final Set<String> registeredSingletons = new LinkedHashSet<>(256);
 
-	/** Names of beans that are currently in creation. */
+	/** Names of beans that are currently in creation.
+	 * 当前正在创建中的单例bean name,创建完后会移除.
+	 * */
 	private final Set<String> singletonsCurrentlyInCreation =
 			Collections.newSetFromMap(new ConcurrentHashMap<>(16));
 
@@ -172,20 +174,30 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	 * Return the (raw) singleton object registered under the given name.
 	 * <p>Checks already instantiated singletons and also allows for an early
 	 * reference to a currently created singleton (resolving a circular reference).
-	 * @param beanName the name of the bean to look for
+	 *
+	 * @param beanName            the name of the bean to look for
 	 * @param allowEarlyReference whether early references should be created or not
 	 * @return the registered singleton object, or {@code null} if none found
 	 */
 	@Nullable
 	protected Object getSingleton(String beanName, boolean allowEarlyReference) {
+		// 先找一级缓存
 		Object singletonObject = this.singletonObjects.get(beanName);
+		// 一级缓存为空 并且  当前beanName 正在创建中
 		if (singletonObject == null && isSingletonCurrentlyInCreation(beanName)) {
+			// 加锁一级缓存的原因: 源码中的所有针对这三个缓存的读写操作都是锁一级缓存对象.保证并发读写安全.
 			synchronized (this.singletonObjects) {
+				// 再找二级缓存
 				singletonObject = this.earlySingletonObjects.get(beanName);
+				// 二级缓存为空 并且  允许早期引用
 				if (singletonObject == null && allowEarlyReference) {
+					// 最后再找三级缓存
 					ObjectFactory<?> singletonFactory = this.singletonFactories.get(beanName);
+					//  三级缓存不为空的情况下
 					if (singletonFactory != null) {
+						// 获取三级缓存lambda;
 						singletonObject = singletonFactory.getObject();
+						// 缓存升级: 将三级缓存中的lambda 对象放入二级缓存
 						this.earlySingletonObjects.put(beanName, singletonObject);
 						this.singletonFactories.remove(beanName);
 					}
