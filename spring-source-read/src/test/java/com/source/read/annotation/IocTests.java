@@ -26,10 +26,7 @@ public class IocTests {
 	@Test
 	@DisplayName("IOC注解版初始化")
 	public void iocAnnotationTest() {
-		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
-		context.register(MainApplication.class);
-		context.addBeanFactoryPostProcessor(new BeanAFactoryPostProcessor());
-		context.refresh();
+		ApplicationContext context = new AnnotationConfigApplicationContext(MainApplication.class);
 		System.out.println(" 注解版 MainApplication---->" + context.getBean(MainApplication.class));
 		System.out.println(" 注解版 使用 @Component 配置的 @Bean 对象---->" + context.getBean("componentX"));
 		System.out.println(" 注解版 CustomizeBeanFactory---->" + context.getBean(CustomizeBeanFactory.class));

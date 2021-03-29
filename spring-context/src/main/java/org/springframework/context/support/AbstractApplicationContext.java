@@ -540,12 +540,12 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				postProcessBeanFactory(beanFactory);
 
 				// Invoke factory processors registered as beans in the context.
-				// 实例化BeanFactoryPostProcessor接口的类并且分批次执行不同的实现 &&  注解版本的Bean定义将在此处加载和注册BeanDefinition ！！！
+				// 实例化BeanFactoryPostProcessor接口的类并且分批次执行不同的实现 && 调用接口的方法 &&  注解版本的Bean定义将在此处加载和注册BeanDefinition ！！！
 				// 这个方法的调用很重要, 在SpringBoot 中 的主动装配 BeanDefinition 就是调用了这一步.
 				invokeBeanFactoryPostProcessors(beanFactory);
 
 				// Register bean processors that intercept bean creation.
-				// 注册BeanPostProcessor
+				// 注册、实例化 BeanPostProcessor , 这里不会调用 BeanPostProcessor中的 before、after 方法!!!
 				registerBeanPostProcessors(beanFactory);
 
 				// Initialize message source for this context.

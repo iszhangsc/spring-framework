@@ -17,6 +17,7 @@ import org.springframework.stereotype.Component;
  * @author zhāngshìchāng
  * @date 2021/3/16 2:13 下午
  */
+@Component
 public class BeanAFactoryPostProcessor implements BeanDefinitionRegistryPostProcessor, PriorityOrdered {
 
 	public BeanAFactoryPostProcessor() {
