@@ -315,7 +315,7 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 		}
 
 		// Parse each @Configuration class
-		// 构造 @Configuration对象
+		// @Configuration 类 解析器
 		ConfigurationClassParser parser = new ConfigurationClassParser(
 				this.metadataReaderFactory, this.problemReporter, this.environment,
 				this.resourceLoader, this.componentScanBeanNameGenerator, registry);
@@ -323,7 +323,7 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 		Set<BeanDefinitionHolder> candidates = new LinkedHashSet<>(configCandidates);
 		Set<ConfigurationClass> alreadyParsed = new HashSet<>(configCandidates.size());
 		do {
-			// 处理@Configuration对象。会扫描配置的Bean，并且注册到BeanDefinitionMap中!!!!!!
+			// 处理 @Configuration对象。会扫描配置的Bean，并且注册到 BeanDefinitionMap中!!!!!!
 			// 这个方法很重要！！！！！
 			parser.parse(candidates);
 			parser.validate();
@@ -337,6 +337,7 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 						registry, this.sourceExtractor, this.resourceLoader, this.environment,
 						this.importBeanNameGenerator, parser.getImportRegistry());
 			}
+			// 加载Bean Definition 注册到 BeanDefinitionMap中!!!!!!
 			this.reader.loadBeanDefinitions(configClasses);
 			alreadyParsed.addAll(configClasses);
 

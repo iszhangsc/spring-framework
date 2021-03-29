@@ -157,6 +157,7 @@ class ConfigurationClassBeanDefinitionReader {
 
 		ScopeMetadata scopeMetadata = scopeMetadataResolver.resolveScopeMetadata(configBeanDef);
 		configBeanDef.setScope(scopeMetadata.getScopeName());
+		// 生成使用Import 导入的beanName
 		String configBeanName = this.importBeanNameGenerator.generateBeanName(configBeanDef, this.registry);
 		AnnotationConfigUtils.processCommonDefinitionAnnotations(configBeanDef, metadata);
 
@@ -250,11 +251,12 @@ class ConfigurationClassBeanDefinitionReader {
 			beanDef.setAutowireCandidate(false);
 		}
 
+		// 获取初始化方法
 		String initMethodName = bean.getString("initMethod");
 		if (StringUtils.hasText(initMethodName)) {
 			beanDef.setInitMethodName(initMethodName);
 		}
-
+		// 获取销毁方法.
 		String destroyMethodName = bean.getString("destroyMethod");
 		beanDef.setDestroyMethodName(destroyMethodName);
 

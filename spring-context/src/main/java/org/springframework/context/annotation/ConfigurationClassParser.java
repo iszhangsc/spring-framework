@@ -270,7 +270,7 @@ class ConfigurationClassParser {
 			ConfigurationClass configClass, SourceClass sourceClass, Predicate<String> filter)
 			throws IOException {
 
-		// 解析@Component
+		// 解析 @Component
 		if (configClass.getMetadata().isAnnotated(Component.class.getName())) {
 			// Recursively process any member (nested) classes first
 			processMemberClasses(configClass, sourceClass, filter);
@@ -291,7 +291,7 @@ class ConfigurationClassParser {
 		}
 
 
-		// 解析任意 @ComponentScan
+		// 解析 @ComponentScan
 		// Process any @ComponentScan annotations
 		Set<AnnotationAttributes> componentScans = AnnotationConfigUtils.attributesForRepeatable(
 				sourceClass.getMetadata(), ComponentScans.class, ComponentScan.class);
@@ -299,6 +299,7 @@ class ConfigurationClassParser {
 				!this.conditionEvaluator.shouldSkip(sourceClass.getMetadata(), ConfigurationPhase.REGISTER_BEAN)) {
 			for (AnnotationAttributes componentScan : componentScans) {
 				// The config class is annotated with @ComponentScan -> perform the scan immediately
+				// 扫描 @ComponentScan 下的类并注册
 				Set<BeanDefinitionHolder> scannedBeanDefinitions =
 						this.componentScanParser.parse(componentScan, sourceClass.getMetadata().getClassName());
 				// Check the set of scanned definitions for any further config classes and parse recursively if needed
@@ -331,7 +332,7 @@ class ConfigurationClassParser {
 			}
 		}
 
-		// 解析单个 @Bean
+		// 解析单个 @Bean 方法！！！！！！
 		// Process individual @Bean methods
 		Set<MethodMetadata> beanMethods = retrieveBeanMethodMetadata(sourceClass);
 		for (MethodMetadata methodMetadata : beanMethods) {
@@ -578,6 +579,7 @@ class ConfigurationClassParser {
 			this.importStack.push(configClass);
 			try {
 				for (SourceClass candidate : importCandidates) {
+					// 判断import 类型
 					if (candidate.isAssignable(ImportSelector.class)) {
 						// Candidate class is an ImportSelector -> delegate to it to determine imports
 						Class<?> candidateClass = candidate.loadClass();
@@ -587,6 +589,7 @@ class ConfigurationClassParser {
 						if (selectorFilter != null) {
 							exclusionFilter = exclusionFilter.or(selectorFilter);
 						}
+						// springboot 的 import 就是这种类型.
 						if (selector instanceof DeferredImportSelector) {
 							this.deferredImportSelectorHandler.handle(configClass, (DeferredImportSelector) selector);
 						}

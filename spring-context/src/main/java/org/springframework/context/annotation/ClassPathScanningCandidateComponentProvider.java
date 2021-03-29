@@ -417,6 +417,7 @@ public class ClassPathScanningCandidateComponentProvider implements EnvironmentC
 		try {
 			String packageSearchPath = ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX +
 					resolveBasePackage(basePackage) + '/' + this.resourcePattern;
+			// 将类 转换成 Resource[]
 			Resource[] resources = getResourcePatternResolver().getResources(packageSearchPath);
 			boolean traceEnabled = logger.isTraceEnabled();
 			boolean debugEnabled = logger.isDebugEnabled();
@@ -486,6 +487,7 @@ public class ClassPathScanningCandidateComponentProvider implements EnvironmentC
 	 * @return whether the class qualifies as a candidate component
 	 */
 	protected boolean isCandidateComponent(MetadataReader metadataReader) throws IOException {
+		// @Component 里面的 excludeFilters 和 includeFilters 来判断是否应该使用该元信息
 		for (TypeFilter tf : this.excludeFilters) {
 			if (tf.match(metadataReader, getMetadataReaderFactory())) {
 				return false;

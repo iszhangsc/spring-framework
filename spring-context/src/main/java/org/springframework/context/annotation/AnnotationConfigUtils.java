@@ -165,7 +165,8 @@ public abstract class AnnotationConfigUtils {
 		Set<BeanDefinitionHolder> beanDefs = new LinkedHashSet<>(8);
 
 		if (!registry.containsBeanDefinition(CONFIGURATION_ANNOTATION_PROCESSOR_BEAN_NAME)) {
-			// ConfigurationClassPostProcessor对所有注册到Spring容器中的BeanDefinition进行处理 ！！！！invokeBeanFactoryPostProcessor 中最优先使用的就是该类处理
+			// ConfigurationClassPostProcessor对所有注册到Spring容器中的BeanDefinition进行处理 ！！！！
+			// invokeBeanFactoryPostProcessor 中最优先使用的就是该类处理
 			RootBeanDefinition def = new RootBeanDefinition(ConfigurationClassPostProcessor.class);
 			def.setSource(source);
 			beanDefs.add(registerPostProcessor(registry, def, CONFIGURATION_ANNOTATION_PROCESSOR_BEAN_NAME));
@@ -179,6 +180,7 @@ public abstract class AnnotationConfigUtils {
 			beanDefs.add(registerPostProcessor(registry, def, AUTOWIRED_ANNOTATION_PROCESSOR_BEAN_NAME));
 		}
 
+		// JSR-250 BeanPostProcessor 相关注解处理: 如 @Resource、@PostConstruct、@PerDestroy
 		// Check for JSR-250 support, and if present add the CommonAnnotationBeanPostProcessor.
 		if (jsr250Present && !registry.containsBeanDefinition(COMMON_ANNOTATION_PROCESSOR_BEAN_NAME)) {
 			RootBeanDefinition def = new RootBeanDefinition(CommonAnnotationBeanPostProcessor.class);
@@ -186,6 +188,7 @@ public abstract class AnnotationConfigUtils {
 			beanDefs.add(registerPostProcessor(registry, def, COMMON_ANNOTATION_PROCESSOR_BEAN_NAME));
 		}
 
+		// JPA 相关 BeanPostProcessor
 		// Check for JPA support, and if present add the PersistenceAnnotationBeanPostProcessor.
 		if (jpaPresent && !registry.containsBeanDefinition(PERSISTENCE_ANNOTATION_PROCESSOR_BEAN_NAME)) {
 			RootBeanDefinition def = new RootBeanDefinition();
