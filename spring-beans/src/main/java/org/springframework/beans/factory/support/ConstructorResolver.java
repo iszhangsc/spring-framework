@@ -551,6 +551,7 @@ class ConstructorResolver {
 						}
 					}
 
+					// 构造方法推断，很复杂!!!
 					int typeDiffWeight = (mbd.isLenientConstructorResolution() ?
 							argsHolder.getTypeDifferenceWeight(paramTypes) : argsHolder.getAssignabilityWeight(paramTypes));
 					// Choose this factory method if it represents the closest match.
