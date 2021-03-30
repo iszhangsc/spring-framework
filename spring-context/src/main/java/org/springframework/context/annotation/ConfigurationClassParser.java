@@ -270,13 +270,13 @@ class ConfigurationClassParser {
 			ConfigurationClass configClass, SourceClass sourceClass, Predicate<String> filter)
 			throws IOException {
 
-		// 解析 @Component
+		// 解析 @Component !!!!
 		if (configClass.getMetadata().isAnnotated(Component.class.getName())) {
 			// Recursively process any member (nested) classes first
 			processMemberClasses(configClass, sourceClass, filter);
 		}
 
-		// 解析任意 @PropertySource
+		// 解析 @PropertySource
 		// Process any @PropertySource annotations
 		for (AnnotationAttributes propertySource : AnnotationConfigUtils.attributesForRepeatable(
 				sourceClass.getMetadata(), PropertySources.class,
@@ -291,7 +291,7 @@ class ConfigurationClassParser {
 		}
 
 
-		// 解析 @ComponentScan
+		// 解析并注册 使用 @ComponentScan 扫描的Bean!!!
 		// Process any @ComponentScan annotations
 		Set<AnnotationAttributes> componentScans = AnnotationConfigUtils.attributesForRepeatable(
 				sourceClass.getMetadata(), ComponentScans.class, ComponentScan.class);
@@ -315,7 +315,9 @@ class ConfigurationClassParser {
 			}
 		}
 
-		// 解析任意 @Import
+		// ==================== 下面的这几种方式在这里都不会注册BeanDefinition.
+
+		// 解析 使用 @Import 导入的Bean  这里不会注册Bean!!!!
 		// Process any @Import annotations
 		processImports(configClass, sourceClass, getImports(sourceClass), filter, true);
 
@@ -332,14 +334,14 @@ class ConfigurationClassParser {
 			}
 		}
 
-		// 解析单个 @Bean 方法！！！！！！
+		// 解析单个 @Bean 方法 这里不会注册Bean！！！！！！
 		// Process individual @Bean methods
 		Set<MethodMetadata> beanMethods = retrieveBeanMethodMetadata(sourceClass);
 		for (MethodMetadata methodMetadata : beanMethods) {
 			configClass.addBeanMethod(new BeanMethod(methodMetadata, configClass));
 		}
 
-		// 处理 接口 上 default 修饰的方法
+		// 处理 接口 上 default 修饰的 @Bean 方法 不会注册Bean！！！
 		// Process default methods on interfaces
 		processInterfaces(configClass, sourceClass);
 
@@ -579,17 +581,18 @@ class ConfigurationClassParser {
 			this.importStack.push(configClass);
 			try {
 				for (SourceClass candidate : importCandidates) {
-					// 判断import 类型
+					// 判断 Import 类型
 					if (candidate.isAssignable(ImportSelector.class)) {
 						// Candidate class is an ImportSelector -> delegate to it to determine imports
 						Class<?> candidateClass = candidate.loadClass();
+						// 实例化 ImportSelector 类， 这种类型的类不会创建 BeanFactory !!!!!
 						ImportSelector selector = ParserStrategyUtils.instantiateClass(candidateClass, ImportSelector.class,
 								this.environment, this.resourceLoader, this.registry);
 						Predicate<String> selectorFilter = selector.getExclusionFilter();
 						if (selectorFilter != null) {
 							exclusionFilter = exclusionFilter.or(selectorFilter);
 						}
-						// springboot 的 import 就是这种类型.
+						// SpringBoot 的 自动装配 AutoConfigurationImportSelector 就是这种类型.
 						if (selector instanceof DeferredImportSelector) {
 							this.deferredImportSelectorHandler.handle(configClass, (DeferredImportSelector) selector);
 						}
@@ -603,12 +606,14 @@ class ConfigurationClassParser {
 						// Candidate class is an ImportBeanDefinitionRegistrar ->
 						// delegate to it to register additional bean definitions
 						Class<?> candidateClass = candidate.loadClass();
+						// 实例化 ImportBeanDefinitionRegistrar 类， 这种类型的类不会创建 BeanFactory !!!!!
 						ImportBeanDefinitionRegistrar registrar =
 								ParserStrategyUtils.instantiateClass(candidateClass, ImportBeanDefinitionRegistrar.class,
 										this.environment, this.resourceLoader, this.registry);
 						configClass.addImportBeanDefinitionRegistrar(registrar, currentSourceClass.getMetadata());
 					}
 					else {
+						// 没有实现 ImportSelector 接口的普通 类
 						// Candidate class not an ImportSelector or ImportBeanDefinitionRegistrar ->
 						// process it as an @Configuration class
 						this.importStack.registerImport(

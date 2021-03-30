@@ -137,14 +137,17 @@ class ConfigurationClassBeanDefinitionReader {
 			return;
 		}
 
+		// 注册Import导入的 bean
 		if (configClass.isImported()) {
 			registerBeanDefinitionForImportedConfigurationClass(configClass);
 		}
+		// 注册 @Bean 导入的 bean, 设置 初始化、销毁方法.
 		for (BeanMethod beanMethod : configClass.getBeanMethods()) {
 			loadBeanDefinitionsForBeanMethod(beanMethod);
 		}
-
+		// 加载 通过资源文件 的bean
 		loadBeanDefinitionsFromImportedResources(configClass.getImportedResources());
+		// 加载 通过 @Import 导入 实现了ImportBeanDefinitionRegistrar 接口 的类
 		loadBeanDefinitionsFromRegistrars(configClass.getImportBeanDefinitionRegistrars());
 	}
 
@@ -157,12 +160,13 @@ class ConfigurationClassBeanDefinitionReader {
 
 		ScopeMetadata scopeMetadata = scopeMetadataResolver.resolveScopeMetadata(configBeanDef);
 		configBeanDef.setScope(scopeMetadata.getScopeName());
-		// 生成使用Import 导入的beanName
+		// 生成使用Import 导入的beanName, 这个beanName是全限定类名.
 		String configBeanName = this.importBeanNameGenerator.generateBeanName(configBeanDef, this.registry);
 		AnnotationConfigUtils.processCommonDefinitionAnnotations(configBeanDef, metadata);
 
 		BeanDefinitionHolder definitionHolder = new BeanDefinitionHolder(configBeanDef, configBeanName);
 		definitionHolder = AnnotationConfigUtils.applyScopedProxyMode(scopeMetadata, definitionHolder, this.registry);
+		// 注册.
 		this.registry.registerBeanDefinition(definitionHolder.getBeanName(), definitionHolder.getBeanDefinition());
 		configClass.setBeanName(configBeanName);
 

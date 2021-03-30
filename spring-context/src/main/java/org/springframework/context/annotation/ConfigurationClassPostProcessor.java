@@ -323,7 +323,7 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 		Set<BeanDefinitionHolder> candidates = new LinkedHashSet<>(configCandidates);
 		Set<ConfigurationClass> alreadyParsed = new HashSet<>(configCandidates.size());
 		do {
-			// 处理 @Configuration对象。会扫描配置的Bean，并且注册到 BeanDefinitionMap中!!!!!!
+			// 处理 @Configuration对象。会扫描配置的Bean，并且注册(不是所有的都会注册)!!!!!!
 			// 这个方法很重要！！！！！
 			parser.parse(candidates);
 			parser.validate();
@@ -337,7 +337,7 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 						registry, this.sourceExtractor, this.resourceLoader, this.environment,
 						this.importBeanNameGenerator, parser.getImportRegistry());
 			}
-			// 加载Bean Definition 注册到 BeanDefinitionMap中!!!!!!
+			// 会将 @Import、@Bean 等方式的Bean 注册 !!!!
 			this.reader.loadBeanDefinitions(configClasses);
 			alreadyParsed.addAll(configClasses);
 

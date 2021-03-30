@@ -129,6 +129,8 @@ class ComponentScanAnnotationParser {
 				return declaringClass.equals(className);
 			}
 		});
+		// 上面都是在设置一系列属性
+
 		// 扫描 ！！！！
 		return scanner.doScan(StringUtils.toStringArray(basePackages));
 	}

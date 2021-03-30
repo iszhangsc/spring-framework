@@ -5,6 +5,8 @@ import com.source.read.annotation.bean.BeanAFactoryPostProcessor;
 import com.source.read.annotation.bean.ComponentConfig;
 import com.source.read.annotation.bean.Customize;
 import com.source.read.annotation.bean.CustomizeBeanFactory;
+import com.source.read.annotation.bean.ImportBeanDefinitionRegistrarBean;
+import com.source.read.annotation.bean.ImportSelectorBean;
 import com.source.read.xml.bean.XBeanA;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -27,6 +29,7 @@ public class IocTests {
 	@DisplayName("IOC注解版初始化")
 	public void iocAnnotationTest() {
 		ApplicationContext context = new AnnotationConfigApplicationContext(MainApplication.class);
+//		System.out.println("注解版 ImportBeanDefinitionRegistrarBean--->" + context.getBean(ImportSelectorBean.class));
 		System.out.println(" 注解版 MainApplication---->" + context.getBean(MainApplication.class));
 		System.out.println(" 注解版 使用 @Component 配置的 @Bean 对象---->" + context.getBean("componentX"));
 		System.out.println(" 注解版 CustomizeBeanFactory---->" + context.getBean(CustomizeBeanFactory.class));

@@ -155,7 +155,7 @@ public abstract class AnnotationConfigUtils {
 				beanFactory.setDependencyComparator(AnnotationAwareOrderComparator.INSTANCE);
 			}
 			if (!(beanFactory.getAutowireCandidateResolver() instanceof ContextAnnotationAutowireCandidateResolver)) {
-				// ContextAnnotationAutowireCandidateResolver集成了多个Resolver,并且拥有BeanFactory功能.
+				// ContextAnnotationAutowireCandidateResolver继承了多个Resolver,并且拥有BeanFactory功能.
 				// Simple(简单适配)、GenericType(泛型是否匹配)、Qualifier(@Qualifier和@Value)、Context(处理@Lazy)
 				beanFactory.setAutowireCandidateResolver(new ContextAnnotationAutowireCandidateResolver());
 			}
@@ -166,7 +166,7 @@ public abstract class AnnotationConfigUtils {
 
 		if (!registry.containsBeanDefinition(CONFIGURATION_ANNOTATION_PROCESSOR_BEAN_NAME)) {
 			// ConfigurationClassPostProcessor对所有注册到Spring容器中的BeanDefinition进行处理 ！！！！
-			// invokeBeanFactoryPostProcessor 中最优先使用的就是该类处理
+			// AbstractApplicationContext#invokeBeanFactoryPostProcessor 掉用
 			RootBeanDefinition def = new RootBeanDefinition(ConfigurationClassPostProcessor.class);
 			def.setSource(source);
 			beanDefs.add(registerPostProcessor(registry, def, CONFIGURATION_ANNOTATION_PROCESSOR_BEAN_NAME));

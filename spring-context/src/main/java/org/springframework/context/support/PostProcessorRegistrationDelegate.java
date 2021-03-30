@@ -73,13 +73,14 @@ final class PostProcessorRegistrationDelegate {
 			// 定义特殊的 BeanFactoryPostProcessor--》 BeanDefinitionRegistryPostProcessor
 			List<BeanDefinitionRegistryPostProcessor> registryProcessors = new ArrayList<>();
 
-			// 一般不会手动 new BeanFactoryPostProcessor() 再添加到ApplicationContext的实现中 , 一般都是让spring自动扫描!!!
+			// 这里循环的 BeanFactoryPostProcessor 是通过手动 new 的，然后再掉用 ConfigurableApplicationContext#addBeanFactoryProcessor() 放入
+			// 这个BeanFactoryPostProcessor并不是spring自动扫描的.！！！！
 			for (BeanFactoryPostProcessor postProcessor : beanFactoryPostProcessors) {
-				// 手动找到的 BeanFactoryPostProcessor、BeanDefinitionRegistryPostProcessor 都是 自己进行实例化的，生命周期不由spring管理.
+				// 找到的不同的 BeanFactoryPostProcessor、BeanDefinitionRegistryPostProcessor 实现
 				if (postProcessor instanceof BeanDefinitionRegistryPostProcessor) {
 					BeanDefinitionRegistryPostProcessor registryProcessor =
 							(BeanDefinitionRegistryPostProcessor) postProcessor;
-					// 找到了 手动传入的 BeanDefinitionRegistryPostProcessor 则优先执行一次该方法.
+					// 执行 BeanDefinitionRegistryPostProcessor 的实现的方法.
 					registryProcessor.postProcessBeanDefinitionRegistry(registry);
 					registryProcessors.add(registryProcessor);
 				}
@@ -95,12 +96,13 @@ final class PostProcessorRegistrationDelegate {
 			List<BeanDefinitionRegistryPostProcessor> currentRegistryProcessors = new ArrayList<>();
 
 			// First, invoke the BeanDefinitionRegistryPostProcessors that implement PriorityOrdered.
-			// 1.1 先调用实现了 PriorityOrdered的BeanDefinitionRegistryPostProcessor
+			// 1.1 先调用实现了 PriorityOrdered 的 BeanDefinitionRegistryPostProcessor
 			String[] postProcessorNames =
 					beanFactory.getBeanNamesForType(BeanDefinitionRegistryPostProcessor.class, true, false);
 			for (String ppName : postProcessorNames) {
 				// 实例化 BeanFactoryPostProcessor 接口对象
 				if (beanFactory.isTypeMatch(ppName, PriorityOrdered.class)) {
+					// 获取 BeanDefinitionRegistryPostProcessor 类型 对应的Bean实例.
 					currentRegistryProcessors.add(beanFactory.getBean(ppName, BeanDefinitionRegistryPostProcessor.class));
 					processedBeans.add(ppName);
 				}
