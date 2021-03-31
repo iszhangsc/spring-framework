@@ -13,8 +13,8 @@ import org.springframework.stereotype.Component;
  * @author zhāngshìchāng
  * @date 2021/3/29 2:50 下午
  */
-//@Component
-public class BeanPostProcessorOrdered  implements BeanPostProcessor, Ordered {
+@Component
+public class BeanPostProcessorOrdered implements BeanPostProcessor, Ordered {
 
 	@Override
 	public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {

@@ -170,7 +170,7 @@ class ConfigurationClassParser {
 		for (BeanDefinitionHolder holder : configCandidates) {
 			BeanDefinition bd = holder.getBeanDefinition();
 			try {
-				// 这里面都是解析
+				// 这里面都是关键的解析方法！！！
 				if (bd instanceof AnnotatedBeanDefinition) {
 					parse(((AnnotatedBeanDefinition) bd).getMetadata(), holder.getBeanName());
 				}
@@ -190,7 +190,7 @@ class ConfigurationClassParser {
 			}
 		}
 
-		// 导入BeanDefinition，SpringBoot就是使用的这个完成自动装配！！！！.
+		// 处理 使用了 @Import 导入的 DeferredImportSelector 接口的类
 		this.deferredImportSelectorHandler.process();
 	}
 
@@ -581,7 +581,7 @@ class ConfigurationClassParser {
 			this.importStack.push(configClass);
 			try {
 				for (SourceClass candidate : importCandidates) {
-					// 判断 Import 类型
+					// 根据 不同的 Import 类型 做不同的操作.
 					if (candidate.isAssignable(ImportSelector.class)) {
 						// Candidate class is an ImportSelector -> delegate to it to determine imports
 						Class<?> candidateClass = candidate.loadClass();
@@ -594,6 +594,7 @@ class ConfigurationClassParser {
 						}
 						// SpringBoot 的 自动装配 AutoConfigurationImportSelector 就是这种类型.
 						if (selector instanceof DeferredImportSelector) {
+							// 这里将当前Configuration类 和 DeferredImportSelector实现对象保存，当parse()方法循环解析处理完再调用.
 							this.deferredImportSelectorHandler.handle(configClass, (DeferredImportSelector) selector);
 						}
 						else {
@@ -786,6 +787,7 @@ class ConfigurationClassParser {
 				handler.processGroupImports();
 			}
 			else {
+				// 将 当期的 ConfigurationClass 和 DeferredImportSelector 保存起来.
 				this.deferredImportSelectors.add(holder);
 			}
 		}
@@ -796,9 +798,11 @@ class ConfigurationClassParser {
 			try {
 				if (deferredImports != null) {
 					DeferredImportSelectorGroupingHandler handler = new DeferredImportSelectorGroupingHandler();
+					// 排序
 					deferredImports.sort(DEFERRED_IMPORT_COMPARATOR);
+					// 按照不同的分组 进行划分
 					deferredImports.forEach(handler::register);
-					// !!!!
+					// 导入处理 !!!!!!!! 最终又会回到 parseImports()；
 					handler.processGroupImports();
 				}
 			}
@@ -816,21 +820,28 @@ class ConfigurationClassParser {
 		private final Map<AnnotationMetadata, ConfigurationClass> configurationClasses = new HashMap<>();
 
 		public void register(DeferredImportSelectorHolder deferredImport) {
+			// 获取当前的 DeferredImportSelector 的  Group
 			Class<? extends Group> group = deferredImport.getImportSelector().getImportGroup();
 			DeferredImportSelectorGrouping grouping = this.groupings.computeIfAbsent(
 					(group != null ? group : deferredImport),
 					key -> new DeferredImportSelectorGrouping(createGroup(group)));
+			// 将当前的 DeferredImportSelector 添加到同一分组中
 			grouping.add(deferredImport);
+			// 保存需要处理的配置类
 			this.configurationClasses.put(deferredImport.getConfigurationClass().getMetadata(),
 					deferredImport.getConfigurationClass());
 		}
 
 		public void processGroupImports() {
+			// 遍历每个分组
 			for (DeferredImportSelectorGrouping grouping : this.groupings.values()) {
+				// 获取分组的过滤器
 				Predicate<String> exclusionFilter = grouping.getCandidateFilter();
+				// 遍历分组中所有的Entry(里面封装了需要引入的类的信息)
 				grouping.getImports().forEach(entry -> {
 					ConfigurationClass configurationClass = this.configurationClasses.get(entry.getMetadata());
 					try {
+						// 俄罗斯套娃继续解析.
 						processImports(configurationClass, asSourceClass(configurationClass, exclusionFilter),
 								Collections.singleton(asSourceClass(entry.getImportClassName(), exclusionFilter)),
 								exclusionFilter, false);

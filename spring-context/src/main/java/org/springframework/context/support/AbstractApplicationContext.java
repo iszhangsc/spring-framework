@@ -544,8 +544,13 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				// 这个方法的调用很重要, 在SpringBoot 中 的主动装配 BeanDefinition 就是调用了这一步.
 				invokeBeanFactoryPostProcessors(beanFactory);
 
+				// =================================================  ↑↑↑↑↑↑↑ 走完，所有 BeanDefinition 将解析和加载完毕.
+
+
+
 				// Register bean processors that intercept bean creation.
-				// 注册、实例化 BeanPostProcessor , 这里不会调用 BeanPostProcessor中的 before、after 方法!!!
+				// 注册、实例化 BeanPostProcessor , 但是这里不会调用 BeanPostProcessor中的 before、after 方法!!!
+				// 这个接口的before、after 方法会在实例化Bean 之后调用. 调用时机BeanFactory类上有注释说明.
 				registerBeanPostProcessors(beanFactory);
 
 				// Initialize message source for this context.
@@ -674,6 +679,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		beanFactory.addPropertyEditorRegistrar(new ResourceEditorRegistrar(this, getEnvironment()));
 
 		// Configure the bean factory with context callbacks.
+		// 这一个后置处理器实现了下面忽略的这几个Aware接口回调功能.(创建Bean的时候回调用.)
 		beanFactory.addBeanPostProcessor(new ApplicationContextAwareProcessor(this));
 		beanFactory.ignoreDependencyInterface(EnvironmentAware.class);
 		beanFactory.ignoreDependencyInterface(EmbeddedValueResolverAware.class);

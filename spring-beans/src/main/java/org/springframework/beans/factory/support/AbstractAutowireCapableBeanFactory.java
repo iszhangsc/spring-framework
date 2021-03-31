@@ -566,7 +566,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		}
 
 		// Allow post-processors to modify the merged bean definition.
-		// 允许 BeanPostProcessor 修改和并的Bean Definition
+		// 允许 BeanPostProcessor 修改和并的BeanDefinition
 		synchronized (mbd.postProcessingLock) {
 			if (!mbd.postProcessed) {
 				try {
@@ -1411,12 +1411,12 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			MutablePropertyValues newPvs = new MutablePropertyValues(pvs);
 			// Add property values based on autowire by name if applicable.
 			if (resolvedAutowireMode == AUTOWIRE_BY_NAME) {
-				// 自动注入
+				// 通过名称自动注入
 				autowireByName(beanName, mbd, bw, newPvs);
 			}
 			// Add property values based on autowire by type if applicable.
 			if (resolvedAutowireMode == AUTOWIRE_BY_TYPE) {
-				// 自动注入
+				// 通过类型自动注入
 				autowireByType(beanName, mbd, bw, newPvs);
 			}
 			pvs = newPvs;
@@ -1791,19 +1791,20 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		// ========== 下面流程为 SpringBean 初始化的生命周期方法.!!!!!
 		// aware->before->InitializingBean->initMethod->after.
 		if (System.getSecurityManager() != null) {
-			// 调用 3个 aware 回调方法.！！
+			// 调用 BeanNameAware、BeanClassLoaderAware、BeanFactoryAware 回调方法.！！
 			AccessController.doPrivileged((PrivilegedAction<Object>) () -> {
 				invokeAwareMethods(beanName, bean);
 				return null;
 			}, getAccessControlContext());
 		} else {
-			// 调用 3个 aware 回调方法.！！
+			// 调用 BeanNameAware、BeanClassLoaderAware、BeanFactoryAware 回调方法.！！
 			invokeAwareMethods(beanName, bean);
 		}
 
 		Object wrappedBean = bean;
 		if (mbd == null || !mbd.isSynthetic()) {
 			// 调用 BeanPostProcessor 的before 方法.！！！
+			// 这里面有一个 ApplicationContextAwareProcessor 会触发调用其它的 XxxAware 接口的方法！！！！！
 			wrappedBean = applyBeanPostProcessorsBeforeInitialization(wrappedBean, beanName);
 		}
 

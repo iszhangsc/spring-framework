@@ -137,7 +137,7 @@ class ConfigurationClassBeanDefinitionReader {
 			return;
 		}
 
-		// 注册Import导入的 bean
+		// 注册Import导入的 BeanDefinition（这个类没有实现 ImportSelector 之类的特殊接口）
 		if (configClass.isImported()) {
 			registerBeanDefinitionForImportedConfigurationClass(configClass);
 		}
