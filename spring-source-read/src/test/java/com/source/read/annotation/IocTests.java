@@ -7,6 +7,8 @@ import com.source.read.annotation.bean.Customize;
 import com.source.read.annotation.bean.CustomizeBeanFactory;
 import com.source.read.annotation.bean.ImportBeanDefinitionRegistrarBean;
 import com.source.read.annotation.bean.ImportSelectorBean;
+import com.source.read.circulardependency.CircularA;
+import com.source.read.circulardependency.CircularDependencyMainApplication;
 import com.source.read.xml.bean.XBeanA;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -35,6 +37,14 @@ public class IocTests {
 		System.out.println(" 注解版 CustomizeBeanFactory---->" + context.getBean(CustomizeBeanFactory.class));
 		System.out.println(" 注解版 CustomizeBeanFactory---->" + context.getBean("customizeBeanFactory"));
 		System.out.println(" 注解版 Customize---->" + context.getBean(Customize.class));
+	}
+
+
+	@Test
+	@DisplayName("循环依赖测试")
+	public void circularDependencyTest() {
+		ApplicationContext applicationContext = new AnnotationConfigApplicationContext(CircularDependencyMainApplication.class);
+		System.out.println("CircularA" + applicationContext.getBean(CircularA.class));
 	}
 
 

@@ -515,7 +515,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		}
 
 		try {
-			// 创建Bean !!!!!
+			// 真正创建Bean的方法 !!!!!
 			Object beanInstance = doCreateBean(beanName, mbdToUse, args);
 			if (logger.isTraceEnabled()) {
 				logger.trace("Finished creating instance of bean '" + beanName + "'");
@@ -1199,12 +1199,12 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			}
 		}
 		if (resolved) {
-			// @Autowired 基于构造器方法实例化.
 			if (autowireNecessary) {
+				//  基于有参构造器方法实例化.
 				return autowireConstructor(beanName, mbd, null, null);
 			}
 			else {
-				// 普通的包扫描.
+				// 基于无参构造方法实力哈
 				return instantiateBean(beanName, mbd);
 			}
 		}
@@ -1817,7 +1817,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 					beanName, "Invocation of init method failed", ex);
 		}
 		if (mbd == null || !mbd.isSynthetic()) {
-			// 调用 BeanPostProcessor after 方法 !!!!
+			// 调用 BeanPostProcessor after 方法 !!!! 返回代理对象.
 			wrappedBean = applyBeanPostProcessorsAfterInitialization(wrappedBean, beanName);
 		}
 
