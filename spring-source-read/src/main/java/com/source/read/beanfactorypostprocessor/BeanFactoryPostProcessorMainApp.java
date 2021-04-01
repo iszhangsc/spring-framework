@@ -1,4 +1,4 @@
-package com.source.read.factorypostprocessor;
+package com.source.read.beanfactorypostprocessor;
 
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;

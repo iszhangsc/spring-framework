@@ -11,7 +11,7 @@ import org.springframework.core.type.AnnotationMetadata;
  * @author zhāngshìchāng
  * @date 2021/3/31 3:35 下午
  */
-public class CustomizeDeferredImportSelector implements DeferredImportSelector {
+public class DeferredImportSelectorBean implements DeferredImportSelector {
 
 	@Override
 	public String[] selectImports(AnnotationMetadata importingClassMetadata) {

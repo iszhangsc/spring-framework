@@ -14,7 +14,7 @@ import org.springframework.context.annotation.Import;
  */
 @ComponentScan
 @Configuration(proxyBeanMethods = false)
-@Import(value = {ImportSelectorBean.class, ImportBeanDefinitionRegistrarBean.class, CustomizeDeferredImportSelector.class})
+@Import(value = {ImportSelectorBean.class, ImportBeanDefinitionRegistrarBean.class, DeferredImportSelectorBean.class})
 public class ImportMainApp {
 
 }

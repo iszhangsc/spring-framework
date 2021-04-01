@@ -2,9 +2,9 @@ package com.source.read.all;
 
 import com.source.read.circulardependency.CircularDependencyMainApp;
 import com.source.read.factorybean.FactoryBeanMainApp;
-import com.source.read.factorypostprocessor.BeanFactoryPostProcessorMainApp;
+import com.source.read.beanfactorypostprocessor.BeanFactoryPostProcessorMainApp;
 import com.source.read.imports.ImportMainApp;
-import com.source.read.postprocessor.PostProcessorMainApp;
+import com.source.read.beanpostprocessor.PostProcessorMainApp;
 import com.source.read.xml.bean.XBeanA;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

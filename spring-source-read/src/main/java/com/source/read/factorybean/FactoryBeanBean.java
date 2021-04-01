@@ -12,17 +12,17 @@ import org.springframework.stereotype.Component;
  * @date 2021-03-27 22:11
  */
 @Component
-public class FactoryBeanBean implements FactoryBean<CustomizeFactoryBean> {
+public class FactoryBeanBean implements FactoryBean<CustomizeBean> {
 
 	@Override
-	public CustomizeFactoryBean getObject() throws Exception {
-		System.out.println("CustomizeFactoryBean 是由 FactoryBeanBean 创建 ");
-		return new CustomizeFactoryBean();
+	public CustomizeBean getObject() throws Exception {
+		System.out.println("CustomizeBean 是由 FactoryBeanBean 创建 ");
+		return new CustomizeBean();
 	}
 
 	@Override
 	public Class<?> getObjectType() {
-		return CustomizeFactoryBean.class;
+		return CustomizeBean.class;
 	}
 
 	@Override
