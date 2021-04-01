@@ -1,9 +1,10 @@
-package com.source.read.annotation.bean;
+package com.source.read.all;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -18,16 +19,10 @@ import org.springframework.stereotype.Component;
  * @date 2021/3/29 4:46 下午
  */
 @Component
-public class InitializationLifeCycleBean implements BeanFactoryAware, ApplicationContextAware, InitializingBean, BeanPostProcessor {
+public class InitializationLifeCycleBean implements BeanFactoryAware, ApplicationContextAware, InitializingBean, BeanPostProcessor, SmartInitializingSingleton {
 
 
-	private final BeanA a;
 	private BeanFactory beanFactory;
-
-	public InitializationLifeCycleBean(BeanA a, BeanA a1) {
-		this.a = a1;
-		System.out.println("InitializationLifeCycleBean 构造方法 beanFactory 属性:" + beanFactory);
-	}
 
 	@Override
 	public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
@@ -57,5 +52,10 @@ public class InitializationLifeCycleBean implements BeanFactoryAware, Applicatio
 		System.out.println("执行了 InitializationLifeCycleBean afterPropertiesSet");
 	}
 
+
+	@Override
+	public void afterSingletonsInstantiated() {
+		System.out.println("执行了 InitializationLifeCycleBean afterSingletonsInstantiated ");
+	}
 
 }

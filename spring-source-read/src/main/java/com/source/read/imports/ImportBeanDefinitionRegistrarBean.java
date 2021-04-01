@@ -1,4 +1,4 @@
-package com.source.read.annotation.bean;
+package com.source.read.imports;
 
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.BeanNameGenerator;

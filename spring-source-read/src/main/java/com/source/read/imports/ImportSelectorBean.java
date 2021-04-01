@@ -1,8 +1,9 @@
-package com.source.read.annotation.bean;
+package com.source.read.imports;
 
-import org.springframework.context.annotation.DeferredImportSelector;
 import org.springframework.context.annotation.ImportSelector;
 import org.springframework.core.type.AnnotationMetadata;
+
+import java.util.function.Predicate;
 
 /**
  * <p>
@@ -10,13 +11,19 @@ import org.springframework.core.type.AnnotationMetadata;
  * </p>
  *
  * @author zhāngshìchāng
- * @date 2021/3/31 3:35 下午
+ * @date 2021/3/30 2:16 下午
  */
-public class CustomizeDeferredImportSelector implements DeferredImportSelector {
+public class ImportSelectorBean implements ImportSelector {
+
 
 	@Override
 	public String[] selectImports(AnnotationMetadata importingClassMetadata) {
-		return new String[0];
+		return new String[]{};
+	}
+
+	@Override
+	public Predicate<String> getExclusionFilter() {
+		return null;
 	}
 
 }

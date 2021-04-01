@@ -1,8 +1,7 @@
-package com.source.read.annotation.bean;
+package com.source.read.postprocessor;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
-import org.springframework.core.Ordered;
 import org.springframework.stereotype.Component;
 
 /**
@@ -11,26 +10,20 @@ import org.springframework.stereotype.Component;
  * </p>
  *
  * @author zhāngshìchāng
- * @date 2021/3/29 2:50 下午
+ * @date 2021/4/1 11:16 上午
  */
 @Component
-public class BeanPostProcessorOrdered implements BeanPostProcessor, Ordered {
+public class PostProcessorNoOrderedBean implements BeanPostProcessor {
 
 	@Override
 	public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
-		System.out.println("执行了 BeanPostProcessorOrdered before 方法");
 		return bean;
 	}
 
 	@Override
 	public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
-		System.out.println("执行了 BeanPostProcessorOrdered after 方法");
 		return bean;
 	}
 
-	@Override
-	public int getOrder() {
-		return Ordered.HIGHEST_PRECEDENCE;
-	}
 
 }

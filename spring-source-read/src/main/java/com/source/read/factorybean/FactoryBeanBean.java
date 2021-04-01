@@ -1,4 +1,4 @@
-package com.source.read.annotation.bean;
+package com.source.read.factorybean;
 
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.stereotype.Component;
@@ -12,16 +12,17 @@ import org.springframework.stereotype.Component;
  * @date 2021-03-27 22:11
  */
 @Component
-public class CustomizeBeanFactory implements FactoryBean<Customize> {
+public class FactoryBeanBean implements FactoryBean<CustomizeFactoryBean> {
 
 	@Override
-	public Customize getObject() throws Exception {
-		return new Customize();
+	public CustomizeFactoryBean getObject() throws Exception {
+		System.out.println("CustomizeFactoryBean 是由 FactoryBeanBean 创建 ");
+		return new CustomizeFactoryBean();
 	}
 
 	@Override
 	public Class<?> getObjectType() {
-		return Customize.class;
+		return CustomizeFactoryBean.class;
 	}
 
 	@Override

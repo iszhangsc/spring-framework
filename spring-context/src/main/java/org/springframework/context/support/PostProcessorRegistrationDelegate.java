@@ -41,6 +41,9 @@ import org.springframework.core.PriorityOrdered;
 import org.springframework.lang.Nullable;
 
 /**
+ * 该类提供了:
+ * 一、BeanFactoryPostProcessor 的实例创建和接口方法调用执行
+ * 二、BeanPostProcessor 的实例创建和注册， 接口方法的调用是在BeanFactory的createBean 时调用.
  * Delegate for AbstractApplicationContext's post-processor handling.
  *
  * @author Juergen Hoeller
@@ -238,6 +241,7 @@ final class PostProcessorRegistrationDelegate {
 		List<String> nonOrderedPostProcessorNames = new ArrayList<>();
 		// 将实现了 PriorityOrdered、Ordered、和普通的BeanPostProcessor 分开存放.
 		for (String ppName : postProcessorNames) {
+			// 实现了 PriorityOrdered BeanPostProcessor 这里会提前创建Bean实例.
 			if (beanFactory.isTypeMatch(ppName, PriorityOrdered.class)) {
 				// 如果单例池中没有.则创建Bean!!!
 				BeanPostProcessor pp = beanFactory.getBean(ppName, BeanPostProcessor.class);
@@ -254,6 +258,7 @@ final class PostProcessorRegistrationDelegate {
 			}
 		}
 
+		// 建议：其实这两个方法可以封装成一个方法.后面有几个这样重复的代码.......
 		// First, register the BeanPostProcessors that implement PriorityOrdered.
 		// 首先， 注册实现了 PriorityOrdered 的 BeanPostProcessor
 		sortPostProcessors(priorityOrderedPostProcessors, beanFactory);
@@ -287,6 +292,7 @@ final class PostProcessorRegistrationDelegate {
 		}
 		registerBeanPostProcessors(beanFactory, nonOrderedPostProcessors);
 
+		// 最后再添加内部的BeanPostProcessor实现到beanFactory中
 		// Finally, re-register all internal BeanPostProcessors.
 		sortPostProcessors(internalPostProcessors, beanFactory);
 		registerBeanPostProcessors(beanFactory, internalPostProcessors);

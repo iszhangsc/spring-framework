@@ -553,6 +553,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				// 这个接口的before、after 方法会在实例化Bean 之后调用. 调用时机BeanFactory类上有注释说明.
 				registerBeanPostProcessors(beanFactory);
 
+				// 消息国际化定义,只需要注意一下自定义时beanName 一定要声明为 messageSource
 				// Initialize message source for this context.
 				initMessageSource();
 
@@ -564,6 +565,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				// Initialize other special beans in specific context subclasses.
 				onRefresh();
 
+				// 注册监听器
 				// Check for listener beans and register them.
 				registerListeners();
 
@@ -759,6 +761,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 */
 	protected void initMessageSource() {
 		ConfigurableListableBeanFactory beanFactory = getBeanFactory();
+		// 消息国际化 的bean 的beanName 必须是 messageSource ！！！！
 		if (beanFactory.containsLocalBean(MESSAGE_SOURCE_BEAN_NAME)) {
 			this.messageSource = beanFactory.getBean(MESSAGE_SOURCE_BEAN_NAME, MessageSource.class);
 			// Make MessageSource aware of parent MessageSource.
@@ -793,6 +796,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 */
 	protected void initApplicationEventMulticaster() {
 		ConfigurableListableBeanFactory beanFactory = getBeanFactory();
+		// beanName 一定要为 applicationEventMulticaster
 		if (beanFactory.containsLocalBean(APPLICATION_EVENT_MULTICASTER_BEAN_NAME)) {
 			this.applicationEventMulticaster =
 					beanFactory.getBean(APPLICATION_EVENT_MULTICASTER_BEAN_NAME, ApplicationEventMulticaster.class);
@@ -880,6 +884,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 */
 	protected void finishBeanFactoryInitialization(ConfigurableListableBeanFactory beanFactory) {
 		// Initialize conversion service for this context.
+		// 为上下文初始化类型转换器.
 		if (beanFactory.containsBean(CONVERSION_SERVICE_BEAN_NAME) &&
 				beanFactory.isTypeMatch(CONVERSION_SERVICE_BEAN_NAME, ConversionService.class)) {
 			beanFactory.setConversionService(
@@ -900,9 +905,10 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		}
 
 		// Stop using the temporary ClassLoader for type matching.
+		// 停止是使用临时的ClassLoader 进行类型匹配.
 		beanFactory.setTempClassLoader(null);
 
-		// 冻结所有的配置，这里九不再允许修改BeanDefinition
+		// 冻结所有的bean定义，注册的bean定义不允许被修改或后处理。因为马上要开始创建Bean 实例对象了.!!!!
 		// Allow for caching all bean definition metadata, not expecting further changes.
 		beanFactory.freezeConfiguration();
 

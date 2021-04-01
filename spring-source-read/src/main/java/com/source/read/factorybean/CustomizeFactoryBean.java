@@ -1,4 +1,4 @@
-package com.source.read.annotation.bean;
+package com.source.read.factorybean;
 
 /**
  * <p>
@@ -8,6 +8,6 @@ package com.source.read.annotation.bean;
  * @author zhangshichang
  * @date 2021-03-27 22:11
  */
-public class Customize {
+public class CustomizeFactoryBean {
 
 }

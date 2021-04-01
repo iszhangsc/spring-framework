@@ -868,6 +868,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 
 		// Iterate over a copy to allow for init methods which in turn register new bean definitions.
 		// While this may not be part of the regular factory bootstrap, it does otherwise work fine.
+		// 创建beanNames的副本
 		List<String> beanNames = new ArrayList<>(this.beanDefinitionNames);
 
 
@@ -904,18 +905,27 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 			}
 		}
 
+
+		// =====================  ↑↑↑↑↑↑↑↑↑↑↑↑ 走完,bean就创建完毕了.
+
+
 		// Trigger post-initialization callback for all applicable beans...
+		// 触发所有初始化后的回调！！！！
 		for (String beanName : beanNames) {
+			// 这个则一定能获取到bean对象. 上面已经创建完毕.
 			Object singletonInstance = getSingleton(beanName);
+			// Bean 的扩展接口！！！！
 			if (singletonInstance instanceof SmartInitializingSingleton) {
 				SmartInitializingSingleton smartSingleton = (SmartInitializingSingleton) singletonInstance;
 				if (System.getSecurityManager() != null) {
 					AccessController.doPrivileged((PrivilegedAction<Object>) () -> {
+						// 调用扩展点接口方法.
 						smartSingleton.afterSingletonsInstantiated();
 						return null;
 					}, getAccessControlContext());
 				}
 				else {
+					// 调用扩展点接口方法.
 					smartSingleton.afterSingletonsInstantiated();
 				}
 			}

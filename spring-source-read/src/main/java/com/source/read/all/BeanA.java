@@ -1,5 +1,6 @@
-package com.source.read.annotation.bean;
+package com.source.read.all;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -11,6 +12,9 @@ import org.springframework.stereotype.Component;
  * @date 2021/3/16 11:29 上午
  */
 @Component
-public class BeanB {
+public class BeanA {
+
+	@Autowired
+	private BeanB b;
 
 }
