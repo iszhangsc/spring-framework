@@ -296,11 +296,12 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 			}
 
 			if (!typeCheckOnly) {
-				// 将该Bean 标记为已创建 !!!!
+				// 标记当前beanName, 标识当前beanName对应的bean正在被创建或已经被创建.
 				markBeanAsCreated(beanName);
 			}
 
 			try {
+				// BeanDefinition 合并(可能存在父BeanDefinition)
 				RootBeanDefinition mbd = getMergedLocalBeanDefinition(beanName);
 				checkMergedBeanDefinition(mbd, beanName, args);
 
@@ -315,6 +316,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 						}
 						registerDependentBean(dep, beanName);
 						try {
+							// 存在 DependsOn, 这里又从头再来。。。
 							getBean(dep);
 						}
 						catch (NoSuchBeanDefinitionException ex) {

@@ -586,6 +586,7 @@ class ConfigurationClassParser {
 						// Candidate class is an ImportSelector -> delegate to it to determine imports
 						Class<?> candidateClass = candidate.loadClass();
 						// 实例化 ImportSelector 类， 这种类型的类不会创建 BeanFactory !!!!!
+						// 如果实现了一系列XxxAware接口，则会调用对应的方法.
 						ImportSelector selector = ParserStrategyUtils.instantiateClass(candidateClass, ImportSelector.class,
 								this.environment, this.resourceLoader, this.registry);
 						Predicate<String> selectorFilter = selector.getExclusionFilter();

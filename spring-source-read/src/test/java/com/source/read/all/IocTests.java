@@ -1,5 +1,7 @@
 package com.source.read.all;
 
+import com.source.read.aop.AopBean;
+import com.source.read.aop.AopMainApp;
 import com.source.read.circulardependency.CircularDependencyMainApp;
 import com.source.read.factorybean.FactoryBeanMainApp;
 import com.source.read.beanfactorypostprocessor.BeanFactoryPostProcessorMainApp;
@@ -52,6 +54,15 @@ public class IocTests {
 	@DisplayName("BeanPostProcessor测试")
 	public void beanPostProcessorTest() {
 		ApplicationContext applicationContext = new AnnotationConfigApplicationContext(PostProcessorMainApp.class);
+	}
+
+
+	@Test
+	@DisplayName("AOP测试")
+	public void aopTest() {
+		ApplicationContext context = new AnnotationConfigApplicationContext(AopMainApp.class);
+		AopBean bean = context.getBean(AopBean.class);
+		bean.say();
 	}
 
 
