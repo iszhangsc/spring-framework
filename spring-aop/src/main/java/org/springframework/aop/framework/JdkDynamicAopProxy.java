@@ -154,6 +154,8 @@ final class JdkDynamicAopProxy implements AopProxy, InvocationHandler, Serializa
 	@Override
 	@Nullable
 	public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+		// jdk 动态代理调用 ！！！！！
+
 		Object oldProxy = null;
 		boolean setProxyContext = false;
 
@@ -161,6 +163,7 @@ final class JdkDynamicAopProxy implements AopProxy, InvocationHandler, Serializa
 		Object target = null;
 
 		try {
+			// 排除Object 的 一些方法.
 			if (!this.equalsDefined && AopUtils.isEqualsMethod(method)) {
 				// The target does not implement the equals(Object) method itself.
 				return equals(args[0]);
@@ -181,8 +184,10 @@ final class JdkDynamicAopProxy implements AopProxy, InvocationHandler, Serializa
 
 			Object retVal;
 
+			// 有没有必要暴露当前的代理对象
 			if (this.advised.exposeProxy) {
 				// Make invocation available if necessary.
+				// 保存到 ThreadLocal 中
 				oldProxy = AopContext.setCurrentProxy(proxy);
 				setProxyContext = true;
 			}
@@ -193,6 +198,7 @@ final class JdkDynamicAopProxy implements AopProxy, InvocationHandler, Serializa
 			Class<?> targetClass = (target != null ? target.getClass() : null);
 
 			// Get the interception chain for this method.
+			// 获取目标类的方法的拦截链 ！！！！！！
 			List<Object> chain = this.advised.getInterceptorsAndDynamicInterceptionAdvice(method, targetClass);
 
 			// Check whether we have any advice. If we don't, we can fallback on direct
@@ -235,6 +241,7 @@ final class JdkDynamicAopProxy implements AopProxy, InvocationHandler, Serializa
 			}
 			if (setProxyContext) {
 				// Restore old proxy.
+				// 从ThreadLocal 中移除当前代理的对象
 				AopContext.setCurrentProxy(oldProxy);
 			}
 		}

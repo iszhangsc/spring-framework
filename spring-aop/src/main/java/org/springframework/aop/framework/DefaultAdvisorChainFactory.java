@@ -54,6 +54,7 @@ public class DefaultAdvisorChainFactory implements AdvisorChainFactory, Serializ
 		// This is somewhat tricky... We have to process introductions first,
 		// but we need to preserve order in the ultimate list.
 		AdvisorAdapterRegistry registry = GlobalAdvisorAdapterRegistry.getInstance();
+		// 这里是全部的 Advisor
 		Advisor[] advisors = config.getAdvisors();
 		List<Object> interceptorList = new ArrayList<>(advisors.length);
 		Class<?> actualClass = (targetClass != null ? targetClass : method.getDeclaringClass());
@@ -70,9 +71,11 @@ public class DefaultAdvisorChainFactory implements AdvisorChainFactory, Serializ
 						if (hasIntroductions == null) {
 							hasIntroductions = hasMatchingIntroductions(advisors, actualClass);
 						}
+						// 匹配
 						match = ((IntroductionAwareMethodMatcher) mm).matches(method, actualClass, hasIntroductions);
 					}
 					else {
+						// 匹配
 						match = mm.matches(method, actualClass);
 					}
 					if (match) {

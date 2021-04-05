@@ -574,6 +574,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				// 初始化所有 (非懒加载) 的单例！！！！！！！！！！！！！！！！！！！
 				finishBeanFactoryInitialization(beanFactory);
 
+				// 这个里面会触发 LifecycleProcessor 接口的方法. EurekaServer 就是在这里面调用的. !!!
 				// Last step: publish corresponding event.
 				finishRefresh();
 			}

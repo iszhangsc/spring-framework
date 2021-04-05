@@ -244,6 +244,7 @@ public abstract class AopUtils {
 		}
 		classes.addAll(ClassUtils.getAllInterfacesForClassAsSet(targetClass));
 
+		// 循环匹配！！
 		for (Class<?> clazz : classes) {
 			Method[] methods = ReflectionUtils.getAllDeclaredMethods(clazz);
 			for (Method method : methods) {
@@ -286,6 +287,7 @@ public abstract class AopUtils {
 		}
 		else if (advisor instanceof PointcutAdvisor) {
 			PointcutAdvisor pca = (PointcutAdvisor) advisor;
+			// 能否应用切面！！！
 			return canApply(pca.getPointcut(), targetClass, hasIntroductions);
 		}
 		else {

@@ -2,6 +2,7 @@ package com.source.read.all;
 
 import com.source.read.aop.AopBean;
 import com.source.read.aop.AopMainApp;
+import com.source.read.aop.IJdkProxyBean;
 import com.source.read.circulardependency.CircularDependencyMainApp;
 import com.source.read.factorybean.FactoryBeanMainApp;
 import com.source.read.beanfactorypostprocessor.BeanFactoryPostProcessorMainApp;
@@ -62,7 +63,11 @@ public class IocTests {
 	public void aopTest() {
 		ApplicationContext context = new AnnotationConfigApplicationContext(AopMainApp.class);
 		AopBean bean = context.getBean(AopBean.class);
+		// 这里是代理对象 会调用CglibAopProxy 的 intercept 方法
 		bean.say();
+		IJdkProxyBean iJdkProxyBean = context.getBean(IJdkProxyBean.class);
+		// 这里是代理对象 会调用 JdkDynamicAopProxy 的 invoke 方法
+		iJdkProxyBean.jdk();
 	}
 
 

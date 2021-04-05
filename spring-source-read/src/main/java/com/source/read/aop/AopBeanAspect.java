@@ -19,7 +19,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class AopBeanAspect {
 
-	@Pointcut("execution(* com.source.read.aop.AopBean.say(..))")
+	@Pointcut("execution(* com.source.read.aop..*.*(..))")
 	public void pointcut(){}
 
 
@@ -36,6 +36,11 @@ public class AopBeanAspect {
 	@AfterReturning(pointcut = "pointcut()", returning = "ret")
 	public void afterReturning(Object ret) {
 		System.out.println("afterReturning 方法执行.........");
+	}
+
+
+	public void xx() {
+
 	}
 
 }

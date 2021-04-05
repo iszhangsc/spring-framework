@@ -159,6 +159,7 @@ public class ReflectiveMethodInvocation implements ProxyMethodInvocation, Clonea
 	@Nullable
 	public Object proceed() throws Throwable {
 		// We start with an index of -1 and increment early.
+		// 这里整个方法 JDK CGLIB 代理方式 都会调用
 		if (this.currentInterceptorIndex == this.interceptorsAndDynamicMethodMatchers.size() - 1) {
 			return invokeJoinpoint();
 		}

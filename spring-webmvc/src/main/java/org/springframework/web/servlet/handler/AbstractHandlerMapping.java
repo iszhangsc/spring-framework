@@ -402,6 +402,7 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 		}
 		// Bean name or resolved handler?
 		if (handler instanceof String) {
+			// 当 handler 是一个字符串的时候, 说明在该handler 是一个懒加载的bean，这里就需要获取bean
 			String handlerName = (String) handler;
 			handler = obtainApplicationContext().getBean(handlerName);
 		}

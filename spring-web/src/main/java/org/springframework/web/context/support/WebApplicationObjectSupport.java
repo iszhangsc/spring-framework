@@ -51,6 +51,7 @@ public abstract class WebApplicationObjectSupport extends ApplicationObjectSuppo
 	public final void setServletContext(ServletContext servletContext) {
 		if (servletContext != this.servletContext) {
 			this.servletContext = servletContext;
+			// 初始化servlet 上下文
 			initServletContext(servletContext);
 		}
 	}

@@ -502,7 +502,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 		try {
 			// 返回代理对象 ！！！！！（这里其实不会创建代理，因为当前Bean只是一个BeanDefinition，并不是一个对象）
-			// 这里其实是找切点、切面.！！！
+			// 这里其实是找切面类.！！！
 			// Give BeanPostProcessors a chance to return a proxy instead of the target bean instance.
 			Object bean = resolveBeforeInstantiation(beanName, mbdToUse);
 			if (bean != null) {
@@ -591,6 +591,9 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 						"' to allow for resolving potential circular references");
 			}
 			// 早期对象(没有经过初始化的对象) 放入三级缓存 用于解决循环依赖！！
+			// getEarlyBeanReference()方法作用: 调用 SmartInstantiationAwareBeanPostprocessor 的 getEarlyBeanReference() 这个方法,否则啥也不做
+			// 也就是给调用者一个机会，自己实现暴露这个bean的应用逻辑
+			// 比如: 在getEarlyBeanReference() 里面可以自己实现AOP的逻辑.
 			addSingletonFactory(beanName, () -> getEarlyBeanReference(beanName, mbd, bean));
 		}
 
@@ -598,7 +601,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		// 初始化Bean实例
 		Object exposedObject = bean;
 		try {
-			// 初始化填充属性!!!
+			// 初始化填充属性!!! 循环依赖就是发生在这里
 			populateBean(beanName, mbd, instanceWrapper);
 			// 调用 Bean 初始化生命周期方法 !!!
 			exposedObject = initializeBean(beanName, exposedObject, mbd);
@@ -972,6 +975,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			for (BeanPostProcessor bp : getBeanPostProcessors()) {
 				if (bp instanceof SmartInstantiationAwareBeanPostProcessor) {
 					SmartInstantiationAwareBeanPostProcessor ibp = (SmartInstantiationAwareBeanPostProcessor) bp;
+					// 这里主要是调用 AbstractAutoProxyCreator.getEarlyBeanReference() 方法.
 					exposedObject = ibp.getEarlyBeanReference(exposedObject, beanName);
 				}
 			}

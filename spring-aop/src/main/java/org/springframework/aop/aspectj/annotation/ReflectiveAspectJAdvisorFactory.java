@@ -117,7 +117,9 @@ public class ReflectiveAspectJAdvisorFactory extends AbstractAspectJAdvisorFacto
 
 	@Override
 	public List<Advisor> getAdvisors(MetadataAwareAspectInstanceFactory aspectInstanceFactory) {
+		// 原始类
 		Class<?> aspectClass = aspectInstanceFactory.getAspectMetadata().getAspectClass();
+		// 切面名称
 		String aspectName = aspectInstanceFactory.getAspectMetadata().getAspectName();
 		validate(aspectClass);
 
@@ -127,6 +129,7 @@ public class ReflectiveAspectJAdvisorFactory extends AbstractAspectJAdvisorFacto
 				new LazySingletonAspectInstanceFactoryDecorator(aspectInstanceFactory);
 
 		List<Advisor> advisors = new ArrayList<>();
+		// 从切面类获取所有非 @Pointcut标注的方法. Advisor
 		for (Method method : getAdvisorMethods(aspectClass)) {
 			// Prior to Spring Framework 5.2.7, advisors.size() was supplied as the declarationOrderInAspect
 			// to getAdvisor(...) to represent the "current position" in the declared methods list.
@@ -136,6 +139,7 @@ public class ReflectiveAspectJAdvisorFactory extends AbstractAspectJAdvisorFacto
 			// discovered via reflection in order to support reliable advice ordering across JVM launches.
 			// Specifically, a value of 0 aligns with the default value used in
 			// AspectJPrecedenceComparator.getAspectDeclarationOrder(Advisor).
+			// 通过 aop 定义的相关注解 如 @Before 等注解 找到Advisor
 			Advisor advisor = getAdvisor(method, lazySingletonAspectInstanceFactory, 0, aspectName);
 			if (advisor != null) {
 				advisors.add(advisor);
@@ -161,8 +165,10 @@ public class ReflectiveAspectJAdvisorFactory extends AbstractAspectJAdvisorFacto
 
 	private List<Method> getAdvisorMethods(Class<?> aspectClass) {
 		final List<Method> methods = new ArrayList<>();
+		// 找到切面中的所有方法.
 		ReflectionUtils.doWithMethods(aspectClass, method -> {
 			// Exclude pointcuts
+			// 排除使用 @Pointcut 标注的方法
 			if (AnnotationUtils.getAnnotation(method, Pointcut.class) == null) {
 				methods.add(method);
 			}
@@ -259,7 +265,7 @@ public class ReflectiveAspectJAdvisorFactory extends AbstractAspectJAdvisorFacto
 		}
 
 		AbstractAspectJAdvice springAdvice;
-
+		// 切面注解相关 实例返回 !!!!
 		switch (aspectJAnnotation.getAnnotationType()) {
 			case AtPointcut:
 				if (logger.isDebugEnabled()) {

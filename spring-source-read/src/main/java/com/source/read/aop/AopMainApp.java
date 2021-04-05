@@ -14,7 +14,7 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
  */
 @ComponentScan
 @Configuration
-@EnableAspectJAutoProxy
+@EnableAspectJAutoProxy(exposeProxy = true)
 public class AopMainApp {
 
 }

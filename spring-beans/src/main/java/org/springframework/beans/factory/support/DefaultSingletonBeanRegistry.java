@@ -74,20 +74,28 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	private static final int SUPPRESSED_EXCEPTIONS_LIMIT = 100;
 
 
-	/** Cache of singleton objects: bean name to bean instance. */
+	/**
+	 * 一级缓存实例
+	 * Cache of singleton objects: bean name to bean instance.
+	 * */
 	private final Map<String, Object> singletonObjects = new ConcurrentHashMap<>(256);
 
-	/** Cache of singleton factories: bean name to ObjectFactory. */
+	/**
+	 * 三级缓存实例
+	 * Cache of singleton factories: bean name to ObjectFactory. */
 	private final Map<String, ObjectFactory<?>> singletonFactories = new HashMap<>(16);
 
-	/** Cache of early singleton objects: bean name to bean instance. */
+	/**
+	 * 二级缓存实例
+	 *  Cache of early singleton objects: bean name to bean instance. */
 	private final Map<String, Object> earlySingletonObjects = new HashMap<>(16);
 
 	/** Set of registered singletons, containing the bean names in registration order. */
 	private final Set<String> registeredSingletons = new LinkedHashSet<>(256);
 
 	/** Names of beans that are currently in creation.
-	 * 当前正在创建中的单例bean name,创建完后会移除.
+	 *  这个缓存也十分重要：它表示bean创建过程中都会在里面呆着, 可以在填充属性时判断是否存在循环依赖.
+	 *  它在Bean开始创建时放值，创建完成时会将其移出~
 	 * */
 	private final Set<String> singletonsCurrentlyInCreation =
 			Collections.newSetFromMap(new ConcurrentHashMap<>(16));
@@ -191,11 +199,13 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 				singletonObject = this.earlySingletonObjects.get(beanName);
 				// 二级缓存为空 并且  允许早期引用
 				if (singletonObject == null && allowEarlyReference) {
-					// 最后再找三级缓存
+					// 最后再找三级缓存包装对象
 					ObjectFactory<?> singletonFactory = this.singletonFactories.get(beanName);
 					//  三级缓存不为空的情况下
 					if (singletonFactory != null) {
-						// 获取三级缓存lambda;
+						// 获取三级缓存 对象; 这里会跳转到 AbstractAutowireCapableBeanFactory.getEarlyBeanReference() 去执行
+						// SmartInstantiationAwareBeanPostProcessor 接口的 getEarlyBeanReference() 方法.
+						// 该方法有一个特殊的实现 就是 AbstractAutoProxyCreator 进行了 代理 !!!
 						singletonObject = singletonFactory.getObject();
 						// 缓存升级: 将三级缓存中的lambda 对象放入二级缓存
 						this.earlySingletonObjects.put(beanName, singletonObject);
